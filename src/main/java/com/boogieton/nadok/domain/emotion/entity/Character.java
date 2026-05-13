@@ -1,0 +1,33 @@
+package com.boogieton.nadok.domain.emotion.entity;
+
+import com.boogieton.nadok.global.entity.BaseEntity;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+@Entity
+@Table(name = "character")
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class Character extends BaseEntity {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long characterId;
+
+    @Column(nullable = false)
+    private String characterName;
+
+    @Column(nullable = false, columnDefinition = "TEXT")
+    private String bookQuote;
+
+    @Column(nullable = false, name = "character_img_url")
+    private String characterImgUrl;
+
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "book_id", nullable = false)
+//    private Book book;
+}
