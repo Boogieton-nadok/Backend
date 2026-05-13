@@ -1,5 +1,6 @@
 package com.boogieton.nadok.domain.chat.dto;
 
+import com.boogieton.nadok.domain.user.entity.User;
 import lombok.Builder;
 import lombok.Getter;
 import java.time.LocalDateTime;

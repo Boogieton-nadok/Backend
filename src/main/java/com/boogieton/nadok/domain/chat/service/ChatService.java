@@ -8,6 +8,8 @@ import com.boogieton.nadok.domain.chat.exception.ChatResponseCode;
 import com.boogieton.nadok.domain.chat.repository.ChatMessageRepository;
 import com.boogieton.nadok.domain.chat.repository.ChatRoomRepository;
 
+import com.boogieton.nadok.domain.user.entity.User;
+import com.boogieton.nadok.domain.user.repository.UserRepository;
 import com.boogieton.nadok.global.exception.BaseException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,11 +25,16 @@ public class ChatService {
     private final ChatRoomRepository chatRoomRepository;
     private final ChatMessageRepository chatMessageRepository;
     private final GroqApiService groqApiService;
+    private final UserRepository userRepository;
 
     @Transactional
     public CreateRoomRes createRoom(CreateRoomReq req) {
+
+        User user =  userRepository.findById(req.getUserId())
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다."));
+
         ChatRoom room = ChatRoom.builder()
-                .userId(req.getUserId())
+                .user(user)
                 .bookId(req.getBookId())
                 .topic(req.getTopic())
                 .build();
@@ -42,7 +49,7 @@ public class ChatService {
     @Transactional(readOnly = true)
     public List<RoomListRes> getRoomList(Long userId) {
 
-        List<ChatRoom> rooms = chatRoomRepository.findByUserIdOrderByUpdateAtDesc(userId);
+        List<ChatRoom> rooms = chatRoomRepository.findByUser_UserIdOrderByUpdateAtDesc(userId);
 
         if(rooms.isEmpty()){
             throw new BaseException(ChatResponseCode.SEARCH_RESULT_NOT_FOUND);
@@ -103,11 +110,17 @@ public class ChatService {
                 .build();
         chatMessageRepository.save(userMessage);
 
-        // 2. DB에서 해당 방의 "과거 대화 + 방금 저장한 유저 메시지"를 시간순으로 모두 불러옵니다.
-        List<ChatMessage> chatHistory = chatMessageRepository.findByChatRoomOrderByCreatedAtAsc(room);
+        // 2. 전체 대화 내역 조회 (문맥 유지를 위해)
+        List<ChatMessage> fullHistory = chatMessageRepository.findByChatRoomOrderByCreatedAtAsc(room);
 
-        // 3. 전체 대화 내역을 Groq API로 보내서 문맥이 이어지는 응답을 받습니다.
-        String aiResponse = groqApiService.getAiResponse(chatHistory, room.getTopic());
+        // 👇 추가할 코드: '슬라이딩 윈도우' 적용 (최근 20개의 메시지만 잘라서 전송)
+        int maxMessages = 20; // 가독이가 기억할 최근 메시지 개수 (원하는 대로 조절 가능)
+        List<ChatMessage> recentHistory = fullHistory.size() > maxMessages
+                ? fullHistory.subList(fullHistory.size() - maxMessages, fullHistory.size())
+                : fullHistory;
+
+        // 3. AI 응답 수신 (전체 내역이 아닌 최근 내역만 보냄!)
+        String aiResponse = groqApiService.getAiResponse(recentHistory, room.getTopic());
 
         // 4. AI 메시지를 DB에 저장합니다.
         ChatMessage aiMessage = ChatMessage.builder()

@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
 
-    List<ChatRoom> findByUserIdOrderByUpdateAtDesc(Long userId);
+    List<ChatRoom> findByUser_UserIdOrderByUpdateAtDesc(Long userId);
     @Query("SELECT c FROM ChatRoom c WHERE c.userId = :userId AND c.topic LIKE %:keyword% ORDER BY c.updateAt DESC")
     List<ChatRoom> searchMyRoomsByKeyword(@Param("userId") Long userId, @Param("keyword") String keyword);
 }
