@@ -35,20 +35,20 @@ public class ChatController {
     }
 
     // 3. 메시지 내역 조회
-    @GetMapping("/rooms/{roomId}/messages")
+    @GetMapping("/{roomId}/messages")
     public SuccessResponse<List<MessageRes>> getMessages(@PathVariable Long roomId) {
         return SuccessResponse.from(chatService.getMessages(roomId));
     }
 
     // 4. 메시지 전송 및 AI 응답
-    @PostMapping("/rooms/{roomId}/message")
+    @PostMapping("/{roomId}/message")
     public SuccessResponse<SendMessageRes> sendMessage(
             @PathVariable Long roomId,
             @RequestBody SendMessageReq request) {
         return SuccessResponse.from(chatService.sendMessage(roomId, request));
     }
 
-    @DeleteMapping("/rooms/{roomId}/delete")
+    @DeleteMapping("/{roomId}/delete")
     public SuccessResponse<RoomListRes> deleteRoom(@PathVariable Long roomId){
         return SuccessResponse.from(chatService.deleteRoom(roomId));
     }

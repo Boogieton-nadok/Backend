@@ -49,7 +49,7 @@ public class ChatService {
     @Transactional(readOnly = true)
     public List<RoomListRes> getRoomList(Long userId) {
 
-        List<ChatRoom> rooms = chatRoomRepository.findByUser_UserIdOrderByUpdateAtDesc(userId);
+        List<ChatRoom> rooms = chatRoomRepository.findByUser_UserIdOrderByUpdatedAtDesc(userId);
 
         if(rooms.isEmpty()){
             throw new BaseException(ChatResponseCode.SEARCH_RESULT_NOT_FOUND);
@@ -59,7 +59,7 @@ public class ChatService {
                         .roomId(room.getRoomId())
                         .topic(room.getTopic())
                         .bookId(room.getBookId())
-                        .updatedAt(room.getUpdateAt())
+                        .updatedAt(room.getUpdatedAt())
                         .build())
                 .collect(Collectors.toList());
     }
@@ -77,7 +77,7 @@ public class ChatService {
                         .roomId(room.getRoomId())
                         .topic(room.getTopic())
                         .bookId(room.getBookId())
-                        .updatedAt(room.getUpdateAt())
+                        .updatedAt(room.getUpdatedAt())
                         .build())
                 .collect(Collectors.toList());
     }
@@ -154,7 +154,7 @@ public class ChatService {
                 .roomId(room.getRoomId())
                 .topic(room.getTopic())
                 .bookId(room.getBookId())
-                .updatedAt(room.getUpdateAt())
+                .updatedAt(room.getUpdatedAt())
                 .build();
         chatRoomRepository.delete(room);
 
