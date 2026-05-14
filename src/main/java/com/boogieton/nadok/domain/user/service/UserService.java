@@ -7,6 +7,7 @@ import com.boogieton.nadok.domain.user.repository.UserRepository;
 import com.boogieton.nadok.global.exception.BaseException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,7 +23,7 @@ public class UserService {
         if (user == null) {
             throw new BaseException(UserResponseCode.USER_NOT_FOUND);
         }
-        if(!user.getPassword().equals(loginReq.getPassword())){
+        if (!user.getPassword().equals(loginReq.getPassword())) {
             throw new BaseException(UserResponseCode.LOGIN_FALSE);
         }
         ProfileRes profileRes = ProfileRes.fromEntity(user);
@@ -32,10 +33,10 @@ public class UserService {
 
     @Transactional
     public ProfileRes signup(@Valid SignupReq signupReq) {
-        if(userRepository.existsByEmail(signupReq.getEmail())){
+        if (userRepository.existsByEmail(signupReq.getEmail())) {
             throw new BaseException(UserResponseCode.EMAIL_DUPLICATION);
         }
-        if(userRepository.existsByNickname(signupReq.getNickname())){
+        if (userRepository.existsByNickname(signupReq.getNickname())) {
             throw new BaseException(UserResponseCode.NICKNAME_DUPLICATION);
         }
         User user = User.builder()
@@ -43,18 +44,23 @@ public class UserService {
                 .password(signupReq.getPassword())
                 .nickname(signupReq.getNickname())
                 .build();
-        User saveUser = userRepository.save(user);
-        ProfileRes profileRes = ProfileRes.fromEntity(saveUser);
-        if(profileRes == null){
-            throw new BaseException(UserResponseCode.SIGNUP_FALSE);
+
+        try {
+            User saveUser = userRepository.save(user);
+            ProfileRes profileRes = ProfileRes.fromEntity(saveUser);
+            if (profileRes == null) {
+                throw new BaseException(UserResponseCode.SIGNUP_FALSE);
+            }
+            return profileRes;
+        } catch (DataIntegrityViolationException e) {
+            throw new BaseException(UserResponseCode.EMAIL_DUPLICATION);
         }
-        return profileRes;
     }
 
     @Transactional(readOnly = true)
-    public CheckAvailableRes checkNickname(String nickname){
+    public CheckAvailableRes checkNickname(String nickname) {
         User user = userRepository.findByNickname(nickname);
-        if(user != null){
+        if (user != null) {
             throw new BaseException(UserResponseCode.NICKNAME_DUPLICATION);
         }
         return new CheckAvailableRes(true);
@@ -63,7 +69,7 @@ public class UserService {
     @Transactional
     public void deleteUser(Long userId) {
         User user = userRepository.findById(userId)
-                        .orElseThrow(() -> new BaseException(UserResponseCode.USER_NOT_FOUND));
+                .orElseThrow(() -> new BaseException(UserResponseCode.USER_NOT_FOUND));
         userRepository.delete(user);
     }
 
@@ -72,8 +78,8 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BaseException(UserResponseCode.USER_NOT_FOUND));
 
-        if(updateReq.getNickname() != null){
-            if(userRepository.existsByNickname(updateReq.getNickname())){
+        if (updateReq.getNickname() != null) {
+            if (userRepository.existsByNicknameAndUserIdNot(updateReq.getNickname(), userId)) {
                 throw new BaseException(UserResponseCode.NICKNAME_DUPLICATION);
             }
         }

@@ -7,14 +7,16 @@ import com.boogieton.nadok.domain.chat.entity.ChatRoom;
 import com.boogieton.nadok.domain.chat.exception.ChatResponseCode;
 import com.boogieton.nadok.domain.chat.repository.ChatMessageRepository;
 import com.boogieton.nadok.domain.chat.repository.ChatRoomRepository;
-
 import com.boogieton.nadok.domain.user.entity.User;
+import com.boogieton.nadok.domain.user.exception.UserResponseCode;
 import com.boogieton.nadok.domain.user.repository.UserRepository;
 import com.boogieton.nadok.global.exception.BaseException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,8 +32,8 @@ public class ChatService {
     @Transactional
     public CreateRoomRes createRoom(CreateRoomReq req) {
 
-        User user =  userRepository.findById(req.getUserId())
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다."));
+        User user = userRepository.findById(req.getUserId())
+                .orElseThrow(() -> new BaseException(UserResponseCode.USER_NOT_FOUND));
 
         ChatRoom room = ChatRoom.builder()
                 .user(user)
@@ -51,15 +53,16 @@ public class ChatService {
 
         List<ChatRoom> rooms = chatRoomRepository.findByUser_UserIdOrderByUpdatedAtDesc(userId);
 
-        if(rooms.isEmpty()){
+        if (rooms.isEmpty()) {
             throw new BaseException(ChatResponseCode.SEARCH_RESULT_NOT_FOUND);
         }
-        return rooms.stream() // BaseEntity 필드명 updateAt 사용
+        return rooms.stream()
+                .sorted(Comparator.comparing(this::getRoomActivityAt).reversed())
                 .map(room -> RoomListRes.builder()
                         .roomId(room.getRoomId())
                         .topic(room.getTopic())
                         .bookId(room.getBookId())
-                        .updatedAt(room.getUpdatedAt())
+                        .updatedAt(getRoomActivityAt(room))
                         .build())
                 .collect(Collectors.toList());
     }
@@ -68,23 +71,24 @@ public class ChatService {
     public List<RoomListRes> searchRoomList(Long userId, String keyword) {
         List<ChatRoom> rooms = chatRoomRepository.searchMyRoomsByKeyword(userId, keyword);
 
-        if(rooms.isEmpty()){
+        if (rooms.isEmpty()) {
             throw new BaseException(ChatResponseCode.SEARCH_RESULT_NOT_FOUND);
         }
 
         return rooms.stream()
+                .sorted(Comparator.comparing(this::getRoomActivityAt).reversed())
                 .map(room -> RoomListRes.builder()
                         .roomId(room.getRoomId())
                         .topic(room.getTopic())
                         .bookId(room.getBookId())
-                        .updatedAt(room.getUpdatedAt())
+                        .updatedAt(getRoomActivityAt(room))
                         .build())
                 .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
-    public List<MessageRes> getMessages(Long roomId) {
-        ChatRoom room = chatRoomRepository.findById(roomId)
+    public List<MessageRes> getMessages(Long userId, Long roomId) {
+        ChatRoom room = chatRoomRepository.findByRoomIdAndUser_UserId(roomId, userId)
                 .orElseThrow(() -> new BaseException(ChatResponseCode.CHAT_ROOM_NOT_FOUND));
 
         return chatMessageRepository.findByChatRoomOrderByCreatedAtAsc(room).stream()
@@ -99,10 +103,9 @@ public class ChatService {
 
     @Transactional
     public SendMessageRes sendMessage(Long roomId, SendMessageReq req) {
-        ChatRoom room = chatRoomRepository.findById(roomId)
+        ChatRoom room = chatRoomRepository.findByRoomIdAndUser_UserId(roomId, req.getUserId())
                 .orElseThrow(() -> new BaseException(ChatResponseCode.CHAT_ROOM_NOT_FOUND));
 
-        // 1. 유저 메시지를 먼저 DB에 저장합니다.
         ChatMessage userMessage = ChatMessage.builder()
                 .chatRoom(room)
                 .content(req.getContent())
@@ -110,19 +113,15 @@ public class ChatService {
                 .build();
         chatMessageRepository.save(userMessage);
 
-        // 2. 전체 대화 내역 조회 (문맥 유지를 위해)
         List<ChatMessage> fullHistory = chatMessageRepository.findByChatRoomOrderByCreatedAtAsc(room);
 
-        // 👇 추가할 코드: '슬라이딩 윈도우' 적용 (최근 20개의 메시지만 잘라서 전송)
-        int maxMessages = 20; // 가독이가 기억할 최근 메시지 개수 (원하는 대로 조절 가능)
+        int maxMessages = 20;
         List<ChatMessage> recentHistory = fullHistory.size() > maxMessages
                 ? fullHistory.subList(fullHistory.size() - maxMessages, fullHistory.size())
                 : fullHistory;
 
-        // 3. AI 응답 수신 (전체 내역이 아닌 최근 내역만 보냄!)
         String aiResponse = groqApiService.getAiResponse(recentHistory, room.getTopic());
 
-        // 4. AI 메시지를 DB에 저장합니다.
         ChatMessage aiMessage = ChatMessage.builder()
                 .chatRoom(room)
                 .content(aiResponse)
@@ -147,17 +146,22 @@ public class ChatService {
     }
 
     @Transactional
-    public RoomListRes deleteRoom(Long roomId) {
-        ChatRoom room = chatRoomRepository.findById(roomId)
-                .orElseThrow(()-> new BaseException(ChatResponseCode.CHAT_ROOM_NOT_FOUND));
+    public RoomListRes deleteRoom(Long userId, Long roomId) {
+        ChatRoom room = chatRoomRepository.findByRoomIdAndUser_UserId(roomId, userId)
+                .orElseThrow(() -> new BaseException(ChatResponseCode.CHAT_ROOM_NOT_FOUND));
         RoomListRes response = RoomListRes.builder()
                 .roomId(room.getRoomId())
                 .topic(room.getTopic())
                 .bookId(room.getBookId())
-                .updatedAt(room.getUpdatedAt())
+                .updatedAt(getRoomActivityAt(room))
                 .build();
         chatRoomRepository.delete(room);
 
         return response;
+    }
+
+    private LocalDateTime getRoomActivityAt(ChatRoom room) {
+        ChatMessage latestMessage = chatMessageRepository.findTopByChatRoomOrderByCreatedAtDesc(room);
+        return latestMessage != null ? latestMessage.getCreatedAt() : room.getUpdatedAt();
     }
 }
