@@ -36,5 +36,6 @@ out/
 ### VS Code ###
 .vscode/
 
-# 설정 파일 제외
-application.properties
+# 개인 DB 설정 파일 제외
+application-local.properties
+src/main/java/resources/
