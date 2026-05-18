@@ -2,7 +2,6 @@ package com.boogieton.nadok.domain.emotion.service;
 
 import com.boogieton.nadok.domain.emotion.entity.Character;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -14,15 +13,15 @@ import java.util.Map;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class GeminiApiService {
 
-    @Value("${gemini.api.key}")
+    @Value("AIzaSyB1p4dDjORMmHCymB62B1IWCBV-dnImh9c")
     private String apiKey;
 
     private static final String GEMINI_API_URL =
             "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=";
 
+    private final RestTemplate restTemplate = new RestTemplate();
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     public boolean validateDiary(String inputText) {
@@ -37,9 +36,8 @@ public class GeminiApiService {
         return result.trim().equalsIgnoreCase("true");
     }
 
-    public GeminiAnalysisResult analyzeEmotion(String inputText, String emotionTag,
-                                               String comfortMethod, List<Character> characters) {
-        // 캐릭터 목록 문자열로 변환
+    public Long analyzeEmotion(String inputText, String emotionTag,
+                               String comfortMethod, List<Character> characters) {
         StringBuilder characterList = new StringBuilder();
         for (Character character : characters) {
             characterList.append(String.format(
@@ -51,45 +49,36 @@ public class GeminiApiService {
         }
 
         String prompt = String.format("""
-        너는 감정 분석 전문가야. 아래 사용자의 일기와 감정 정보를 분석해서 가장 어울리는 캐릭터를 골라줘.
-        
-        [사용자 정보]
-        일기: %s
-        감정 태그: %s
-        위로 방식: %s
-        
-        [캐릭터 목록]
-        %s
-        
-        위 캐릭터 중 사용자에게 가장 어울리는 캐릭터를 하나 선택하고,
-        이유는 위로 방식에 맞게 작성해줘.
-        반드시 아래 JSON 형식으로만 응답해. 다른 말은 절대 하지마.
-        {
-          "characterId": 선택한 캐릭터 ID (숫자),
-          "methodReason": "이 캐릭터를 선택한 이유 (2~3문장)"
-        }
-        """, inputText, emotionTag, comfortMethod, characterList);
+                너는 감정 분석 전문가야. 아래 사용자의 일기와 감정 정보를 분석해서 가장 어울리는 캐릭터를 골라줘.
+                
+                [사용자 정보]
+                일기: %s
+                감정 태그: %s
+                위로 방식: %s
+                
+                [캐릭터 목록]
+                %s
+                
+                위 캐릭터 중 사용자에게 가장 어울리는 캐릭터를 하나 선택하고,
+                반드시 아래 JSON 형식으로만 응답해. 다른 말은 절대 하지마.
+                {
+                  "characterId": 선택한 캐릭터 ID (숫자)
+                }
+                """, inputText, emotionTag, comfortMethod, characterList);
 
         String result = callGemini(prompt);
 
         try {
-            // JSON 파싱
             String cleaned = result.replaceAll("```json", "").replaceAll("```", "").trim();
             Map<String, Object> map = objectMapper.readValue(cleaned, Map.class);
-            Long characterId = Long.valueOf(map.get("characterId").toString());
-            String methodReason = (String) map.get("methodReason");
-            return new GeminiAnalysisResult(characterId, methodReason);
+            return Long.valueOf(map.get("characterId").toString());
         } catch (Exception e) {
             log.error("Gemini 응답 파싱 실패: {}", result, e);
             throw new RuntimeException("AI 응답 파싱에 실패했습니다.");
         }
     }
 
-    /**
-     * Gemini API 호출 공통 메서드
-     */
     private String callGemini(String prompt) {
-        RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
@@ -119,6 +108,4 @@ public class GeminiApiService {
             throw new RuntimeException("AI 서비스 호출에 실패했습니다.");
         }
     }
-
-    public record GeminiAnalysisResult(Long characterId, String methodReason) {}
 }

@@ -52,31 +52,28 @@ public class EmotionService {
 
         List<Character> characters = characterRepository.findAll();
 
-        GeminiApiService.GeminiAnalysisResult aiResult = geminiApiService.analyzeEmotion(
+        Long characterId = geminiApiService.analyzeEmotion(
                 request.getInputText(),
                 request.getEmotionTag(),
                 request.getComfortMethod(),
                 characters
         );
 
-        log.info("Gemini 선택 캐릭터 ID: {}", aiResult.characterId());
+        log.info("Gemini 선택 캐릭터 ID: {}", characterId);
 
-        Character character = characterRepository.findById(aiResult.characterId())
+        Character character = characterRepository.findById(characterId)
                 .orElseThrow(() -> new IllegalArgumentException("캐릭터를 찾을 수 없습니다."));
 
-        // 6. EmotionResult 저장
         EmotionResult emotionResult = EmotionResult.builder()
                 .emotionInput(emotionInput)
                 .character(character)
-                .methodReason(aiResult.methodReason())
                 .build();
         emotionResultRepository.save(emotionResult);
 
-        // 7. Response 반환
         return EmotionResultRes.builder()
                 .inputId(emotionInput.getInputId())
                 .resultId(emotionResult.getResultId())
-                .methodReason(emotionResult.getMethodReason())
+                .methodReason(character.getMethodReason())
                 .character(EmotionResultRes.CharacterInfo.builder()
                         .characterId(character.getCharacterId())
                         .characterName(character.getCharacterName())

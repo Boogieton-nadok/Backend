@@ -1,5 +1,6 @@
 package com.boogieton.nadok.domain.emotion.entity;
 
+import com.boogieton.nadok.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,13 +13,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class EmotionResult {
+public class EmotionResult extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long resultId;
-
-    @Column(nullable = false, columnDefinition = "TEXT")
-    private String methodReason;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "input_id", nullable = false)

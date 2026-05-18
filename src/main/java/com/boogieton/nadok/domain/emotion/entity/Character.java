@@ -27,7 +27,6 @@ public class Character extends BaseEntity {
     @Column(nullable = false, name = "character_img_url")
     private String characterImgUrl;
 
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "book_id", nullable = false)
-//    private Book book;
+    @Column(nullable = false, columnDefinition = "TEXT")
+    private String methodReason;
 }
