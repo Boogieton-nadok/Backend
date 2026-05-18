@@ -1,6 +1,8 @@
 package com.boogieton.nadok.domain.emotion.service;
 
 import com.boogieton.nadok.domain.emotion.entity.Character;
+import com.boogieton.nadok.domain.emotion.exception.EmotionResponseCode;
+import com.boogieton.nadok.global.exception.BaseException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,11 +17,11 @@ import java.util.Map;
 @Service
 public class GeminiApiService {
 
-    @Value("AIzaSyB1p4dDjORMmHCymB62B1IWCBV-dnImh9c")
+    @Value("${gemini.api.key}")
     private String apiKey;
 
     private static final String GEMINI_API_URL =
-            "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=";
+            "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=";
 
     private final RestTemplate restTemplate = new RestTemplate();
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -74,7 +76,7 @@ public class GeminiApiService {
             return Long.valueOf(map.get("characterId").toString());
         } catch (Exception e) {
             log.error("Gemini 응답 파싱 실패: {}", result, e);
-            throw new RuntimeException("AI 응답 파싱에 실패했습니다.");
+            throw new BaseException(EmotionResponseCode.AI_RESPONSE_PARSE_ERROR);
         }
     }
 
@@ -105,7 +107,7 @@ public class GeminiApiService {
 
         } catch (Exception e) {
             log.error("Gemini API 호출 실패: {}", e.getMessage());
-            throw new RuntimeException("AI 서비스 호출에 실패했습니다.");
+            throw new BaseException(EmotionResponseCode.AI_SERVICE_ERROR);
         }
     }
 }
