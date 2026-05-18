@@ -17,9 +17,6 @@ public class EmotionResult {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long resultId;
 
-    @Column(nullable = false, columnDefinition = "TEXT")
-    private String methodReason;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "input_id", nullable = false)
     private EmotionInput emotionInput;
