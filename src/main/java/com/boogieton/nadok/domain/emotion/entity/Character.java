@@ -28,6 +28,9 @@ public class Character extends BaseEntity {
     @Column(nullable = false, name = "character_img_url")
     private String characterImgUrl;
 
+    @Column(nullable = false)
+    private String keyword;
+
     @Column(nullable = false, columnDefinition = "TEXT")
     private String methodReason;
 
