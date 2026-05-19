@@ -1,5 +1,6 @@
 package com.boogieton.nadok.domain.emotion.entity;
 
+import com.boogieton.nadok.domain.book.entity.Book;
 import com.boogieton.nadok.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -29,4 +30,5 @@ public class Character extends BaseEntity {
 
     @Column(nullable = false, columnDefinition = "TEXT")
     private String methodReason;
+
 }

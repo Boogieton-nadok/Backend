@@ -1,6 +1,7 @@
 package com.boogieton.nadok.domain.user.entity;
 
 import com.boogieton.nadok.domain.chat.entity.ChatRoom;
+import com.boogieton.nadok.domain.mainstudy.entity.MainStudy;
 import com.boogieton.nadok.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Null;
@@ -39,6 +40,10 @@ public class User extends BaseEntity {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ChatRoom> chatRooms = new ArrayList<>();
+
+    @OneToMany(mappedBy = "mainId", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<MainStudy> mainStudies = new ArrayList<>();
 
     public void updateProfile(String nickname, String password, Gender gender, Date birthday) {
         if (nickname != null) this.nickname = nickname;
