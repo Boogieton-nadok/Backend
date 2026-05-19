@@ -1,5 +1,8 @@
 package com.boogieton.nadok.domain.chat.service;
 
+import com.boogieton.nadok.domain.book.entity.Book;
+import com.boogieton.nadok.domain.book.exception.BookResponseCode;
+import com.boogieton.nadok.domain.book.repository.BookRepository;
 import com.boogieton.nadok.domain.chat.dto.ChatDto.*;
 import com.boogieton.nadok.domain.chat.entity.ChatMessage;
 import com.boogieton.nadok.domain.chat.entity.ChatRole;
@@ -28,16 +31,19 @@ public class ChatService {
     private final ChatMessageRepository chatMessageRepository;
     private final GroqApiService groqApiService;
     private final UserRepository userRepository;
+    private final BookRepository bookRepository;
 
     @Transactional
     public CreateRoomRes createRoom(CreateRoomReq req) {
 
         User user = userRepository.findById(req.getUserId())
                 .orElseThrow(() -> new BaseException(UserResponseCode.USER_NOT_FOUND));
+        Book book = bookRepository.findById(req.getBookId())
+                .orElseThrow(() -> new BaseException(BookResponseCode.BOOK_NOT_FOUND));
 
         ChatRoom room = ChatRoom.builder()
                 .user(user)
-                .bookId(req.getBookId())
+                .book(book)
                 .topic(req.getTopic())
                 .build();
         chatRoomRepository.save(room);
@@ -61,7 +67,7 @@ public class ChatService {
                 .map(room -> RoomListRes.builder()
                         .roomId(room.getRoomId())
                         .topic(room.getTopic())
-                        .bookId(room.getBookId())
+                        .bookId(room.getBook().getBookId())
                         .updatedAt(getRoomActivityAt(room))
                         .build())
                 .collect(Collectors.toList());
@@ -80,7 +86,7 @@ public class ChatService {
                 .map(room -> RoomListRes.builder()
                         .roomId(room.getRoomId())
                         .topic(room.getTopic())
-                        .bookId(room.getBookId())
+                        .bookId(room.getBook().getBookId())
                         .updatedAt(getRoomActivityAt(room))
                         .build())
                 .collect(Collectors.toList());
@@ -103,8 +109,10 @@ public class ChatService {
 
     @Transactional
     public SendMessageRes sendMessage(Long roomId, SendMessageReq req) {
-        ChatRoom room = chatRoomRepository.findByRoomIdAndUser_UserId(roomId, req.getUserId())
+        ChatRoom room = chatRoomRepository.findByRoomId(roomId)
                 .orElseThrow(() -> new BaseException(ChatResponseCode.CHAT_ROOM_NOT_FOUND));
+        User user = userRepository.findById(req.getUserId())
+                .orElseThrow(() -> new BaseException(UserResponseCode.USER_NOT_FOUND));
 
         ChatMessage userMessage = ChatMessage.builder()
                 .chatRoom(room)
@@ -147,12 +155,14 @@ public class ChatService {
 
     @Transactional
     public RoomListRes deleteRoom(Long userId, Long roomId) {
-        ChatRoom room = chatRoomRepository.findByRoomIdAndUser_UserId(roomId, userId)
+        ChatRoom room = chatRoomRepository.findByRoomId(roomId)
                 .orElseThrow(() -> new BaseException(ChatResponseCode.CHAT_ROOM_NOT_FOUND));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BaseException(UserResponseCode.USER_NOT_FOUND));
         RoomListRes response = RoomListRes.builder()
                 .roomId(room.getRoomId())
                 .topic(room.getTopic())
-                .bookId(room.getBookId())
+                .bookId(room.getBook().getBookId())
                 .updatedAt(getRoomActivityAt(room))
                 .build();
         chatRoomRepository.delete(room);
