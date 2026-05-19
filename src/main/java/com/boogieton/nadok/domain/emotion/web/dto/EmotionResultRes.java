@@ -10,7 +10,6 @@ import java.time.LocalDateTime;
 public class EmotionResultRes {
     private Long inputId;
     private Long resultId;
-    private String methodReason;
     private CharacterInfo character;
     private LocalDateTime createdAt;
 
@@ -21,5 +20,6 @@ public class EmotionResultRes {
         private String characterName;
         private String characterImgUrl;
         private String bookQuote;
+        private String methodReason;
     }
 }
