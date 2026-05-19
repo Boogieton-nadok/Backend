@@ -29,7 +29,7 @@ public class GroqApiService {
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setBearerAuth(apiKey);
 
-        String systemPrompt = String.format("너는 '나독(NADOK)'의 AI '가독이'야. 주제: %s. 다정하게 대답해줘.", topic);
+        String systemPrompt = String.format("너는 '나독(NADOK)'의 AI '가독이'야. 주제: %s. 다정하게 존댓말로 대답해줘.", topic);
 
         // 1. 메시지 리스트 구성
         List<Map<String, String>> messages = new ArrayList<>();
@@ -44,7 +44,7 @@ public class GroqApiService {
         }
 
         Map<String, Object> body = new HashMap<>();
-        body.put("model", "llama-3.1-8b-instant");
+        body.put("model", "Llama 3.3 70B Versatile");
         body.put("messages", messages); // 구성한 메시지 리스트를 바디에 담음
 
         try {

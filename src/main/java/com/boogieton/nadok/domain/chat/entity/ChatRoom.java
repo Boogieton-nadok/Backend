@@ -1,6 +1,7 @@
 package com.boogieton.nadok.domain.chat.entity;
 
 
+import com.boogieton.nadok.domain.book.entity.Book;
 import com.boogieton.nadok.domain.user.entity.User;
 import com.boogieton.nadok.global.entity.BaseEntity;
 import jakarta.persistence.*;
@@ -25,8 +26,9 @@ public class ChatRoom extends BaseEntity {
     @JoinColumn(name = "userId",nullable = false)
     private User user;
 
-    @Column(nullable = false)
-    private Long bookId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "bookId", nullable = false)
+    private Book book;
 
     @Column(nullable = false)
     private String topic;

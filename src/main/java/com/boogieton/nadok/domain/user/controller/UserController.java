@@ -26,8 +26,8 @@ public class UserController {
         return SuccessResponse.of(userService.signup(signupReq), UserResponseCode.SIGNUP_SUCCESS);
     }
 
-    @GetMapping("/check/{nickname}")
-    public SuccessResponse<CheckAvailableRes> checkNickname(@PathVariable String nickname){
+    @GetMapping("/check")
+    public SuccessResponse<CheckAvailableRes> checkNickname(@RequestParam String nickname){
         return SuccessResponse.of(userService.checkNickname(nickname), UserResponseCode.NICKNAME_SUCCESS);
     }
 
