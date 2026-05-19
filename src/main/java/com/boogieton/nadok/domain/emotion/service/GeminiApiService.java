@@ -46,12 +46,14 @@ public class GeminiApiService {
                     "- ID: %d, 이름: %s, 명언: %s\n",
                     character.getCharacterId(),
                     character.getCharacterName(),
+                    character.getKeyword(),
                     character.getBookQuote()
             ));
         }
 
         String prompt = String.format("""
                 너는 감정 분석 전문가야. 아래 사용자의 일기와 감정 정보를 분석해서 가장 어울리는 캐릭터를 골라줘.
+                캐릭터의 키워드가 사용자의 감정 태그와 잘 맞는지 참고해줘.
                 
                 [사용자 정보]
                 일기: %s
