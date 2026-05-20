@@ -13,6 +13,7 @@ public enum UserResponseCode implements BaseResponseCode {
     LOGIN_FALSE("USER_404_2", 404, "이메일 또는 비밀번호가 일치하지 않습니다."),
     NICKNAME_DUPLICATION("USER_409_1", 409, "이미 존재하는 닉네임입니다."),
     EMAIL_DUPLICATION("USER_409_2", 409, "이미 존재하는 이메일입니다."),
+    PASSWORD_TYPE_ERROR("USER_400_2", 400, "비밀번호는 6~8자 이내여야 합니다."),
     SIGNUP_SUCCESS("USER_200_1",200, "회원가입이 완료되었습니다."),
     LOGIN_SUCCESS("USER_200_2", 200, "로그인에 성공했습니다."),
     UPDATE_SUCCESS("USER_200_3", 200, "회원 정보 수정 성공"),

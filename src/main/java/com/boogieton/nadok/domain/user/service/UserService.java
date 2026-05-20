@@ -39,6 +39,9 @@ public class UserService {
         if (userRepository.existsByNickname(signupReq.getNickname())) {
             throw new BaseException(UserResponseCode.NICKNAME_DUPLICATION);
         }
+        if(signupReq.getPassword().length() < 6 || signupReq.getPassword().length() > 8) {
+            throw new BaseException(UserResponseCode.PASSWORD_TYPE_ERROR);
+        }
         User user = User.builder()
                 .email(signupReq.getEmail())
                 .password(signupReq.getPassword())
