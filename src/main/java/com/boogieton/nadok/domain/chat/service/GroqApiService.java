@@ -44,7 +44,7 @@ public class GroqApiService {
         }
 
         Map<String, Object> body = new HashMap<>();
-        body.put("model", "Llama 3.3 70B Versatile");
+        body.put("model", "llama-3.1-8b-instant");
         body.put("messages", messages); // 구성한 메시지 리스트를 바디에 담음
 
         try {
