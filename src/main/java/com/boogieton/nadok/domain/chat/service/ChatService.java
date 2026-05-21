@@ -54,6 +54,23 @@ public class ChatService {
                 .build();
     }
 
+
+    public CreateRoomRes createRoomNoBook(CreateRoomNoBookReq request) {
+        User user = userRepository.findById(request.getUserId())
+                .orElseThrow(() -> new BaseException(UserResponseCode.USER_NOT_FOUND));
+
+        ChatRoom room = ChatRoom.builder()
+                .user(user)
+                .topic(request.getTopic())
+                .build();
+        chatRoomRepository.save(room);
+
+        return CreateRoomRes.builder()
+                .roomId(room.getRoomId())
+                .createdAt(room.getCreatedAt())
+                .build();
+    }
+
     @Transactional(readOnly = true)
     public List<RoomListRes> getRoomList(Long userId) {
 
@@ -122,13 +139,15 @@ public class ChatService {
         chatMessageRepository.save(userMessage);
 
         List<ChatMessage> fullHistory = chatMessageRepository.findByChatRoomOrderByCreatedAtAsc(room);
+        Book book = room.getBook();
+        String title = (book != null) ? book.getTitle() : null;
 
         int maxMessages = 20;
         List<ChatMessage> recentHistory = fullHistory.size() > maxMessages
                 ? fullHistory.subList(fullHistory.size() - maxMessages, fullHistory.size())
                 : fullHistory;
 
-        String aiResponse = groqApiService.getAiResponse(recentHistory, room.getTopic());
+        String aiResponse = groqApiService.getAiResponse(recentHistory, room.getTopic(), title);
 
         ChatMessage aiMessage = ChatMessage.builder()
                 .chatRoom(room)
@@ -174,4 +193,5 @@ public class ChatService {
         ChatMessage latestMessage = chatMessageRepository.findTopByChatRoomOrderByCreatedAtDesc(room);
         return latestMessage != null ? latestMessage.getCreatedAt() : room.getUpdatedAt();
     }
+
 }

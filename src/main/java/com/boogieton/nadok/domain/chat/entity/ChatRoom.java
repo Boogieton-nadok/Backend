@@ -27,7 +27,7 @@ public class ChatRoom extends BaseEntity {
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "bookId", nullable = false)
+    @JoinColumn(name = "bookId", nullable = true)
     private Book book;
 
     @Column(nullable = false)

@@ -1,5 +1,6 @@
 package com.boogieton.nadok.domain.chat.repository;
 
+import com.boogieton.nadok.domain.book.entity.Book;
 import com.boogieton.nadok.domain.chat.entity.ChatRoom;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -14,4 +15,5 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
     @Query("SELECT c FROM ChatRoom c WHERE c.user.userId = :userId AND c.topic LIKE %:keyword% ORDER BY c.updatedAt DESC")
     List<ChatRoom> searchMyRoomsByKeyword(@Param("userId") Long userId, @Param("keyword") String keyword);
     java.util.Optional<ChatRoom> findByRoomId(Long roomId);
+    Book getBookByRoomId(Long roomId);
 }

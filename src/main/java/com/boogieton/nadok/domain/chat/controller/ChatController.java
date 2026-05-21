@@ -20,6 +20,11 @@ public class ChatController {
         return SuccessResponse.created(chatService.createRoom(request));
     }
 
+    @PostMapping("/rooms/nobook")
+    public SuccessResponse<CreateRoomRes> createRoomNoBook(@RequestBody CreateRoomNoBookReq request) {
+        return SuccessResponse.created(chatService.createRoomNoBook(request));
+    }
+
     @GetMapping("/{userId}")
     public SuccessResponse<List<RoomListRes>> getRoomList(@PathVariable Long userId) {
         return SuccessResponse.from(chatService.getRoomList(userId));

@@ -16,6 +16,12 @@ public class ChatDto {
     }
 
     @Getter
+    public static class CreateRoomNoBookReq {
+        private Long userId;
+        private String topic;
+    }
+
+    @Getter
     @Builder
     public static class CreateRoomRes {
         private Long roomId;

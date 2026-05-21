@@ -23,17 +23,34 @@ public class GroqApiService {
     private static final String GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
 
     // 단일 메시지가 아닌, 채팅 내역 전체(chatHistory)를 받도록 변경
-    public String getAiResponse(List<ChatMessage> chatHistory, String topic) {
+    public String getAiResponse(List<ChatMessage> chatHistory, String topic, String bookTitle) {
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setBearerAuth(apiKey);
 
-        String systemPrompt = String.format("너는 '나독(NADOK)'의 AI '가독이'야. 주제: %s. 다정하게 존댓말로 대답해줘.", topic);
+        String systemPrompt;
+
+        if (bookTitle == null || bookTitle.trim().isEmpty()) {
+            systemPrompt = "당신은 독서 앱 나독(NADOK)의 다정한 AI 독서 메이트 '가독이'입니다. " +
+                    "현재 특정 책이 정해지지 않은 상태로 사용자와 편안하게 대화하고 있습니다. " +
+                    "사용자의 독서 취향, 일상적인 고민이나 감정에 깊이 공감하며 따뜻하고 다정한 존댓말로 대화해 주세요. " +
+                    "어떤 책을 읽으면 좋을지 가볍게 조언해 주어도 좋습니다. " +
+                    "답변은 너무 길지 않게, 최대 200자 이내로 간결하게 작성해 주세요.";
+        }
+        else {
+            systemPrompt = String.format(
+                    "당신은 독서 앱 나독(NADOK)의 다정한 AI 독서 메이트 '가독이'입니다. " +
+                            "현재 사용자와 책 '%s'에 대해 이야기하고 있습니다. " +
+                            "반드시 이 책의 내용, 등장인물, 또는 주제를 바탕으로 대답해 주세요. " +
+                            "사용자의 말에 깊이 공감하며 따뜻하고 다정한 존댓말로 대화해야 합니다. " +
+                            "답변은 너무 길지 않게, 최대 200자 이내로 간결하게 작성해 주세요.", bookTitle
+            );
+        }
+
 
         // 1. 메시지 리스트 구성
         List<Map<String, String>> messages = new ArrayList<>();
-        // 시스템 프롬프트 추가
         messages.add(Map.of("role", "system", "content", systemPrompt));
 
         // 2. 과거 대화 내역을 순서대로 추가
