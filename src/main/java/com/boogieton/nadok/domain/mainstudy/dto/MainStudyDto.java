@@ -42,6 +42,7 @@ public class MainStudyDto {
         private String title;
         private String author;
         private String coverUrl;
+        private String ISBN;
         private ReadingStatus readingStatus;
         private LocalDate startDate;
         private LocalDate endDate;
@@ -53,6 +54,7 @@ public class MainStudyDto {
                     .title(mainStudy.getBook().getTitle())
                     .author(mainStudy.getBook().getAuthor())
                     .coverUrl(mainStudy.getBook().getCoverUrl())
+                    .ISBN(mainStudy.getBook().getIsbn())
                     .readingStatus(mainStudy.getReadingStatus())
                     .startDate(mainStudy.getStartDate())
                     .endDate(mainStudy.getEndDate())
