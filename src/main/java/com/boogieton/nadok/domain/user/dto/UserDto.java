@@ -67,6 +67,7 @@ public class UserDto {
         private String nickname;
         private Gender gender;
         private Date birthday;
+        private String profileImgUrl;
         private LocalDateTime createdAt;
         private LocalDateTime updatedAt;
 

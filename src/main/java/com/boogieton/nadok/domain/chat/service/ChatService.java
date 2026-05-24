@@ -84,7 +84,9 @@ public class ChatService {
                 .map(room -> RoomListRes.builder()
                         .roomId(room.getRoomId())
                         .topic(room.getTopic())
-                        .bookId(room.getBook().getBookId())
+                        .bookId(room.getBook() == null ? null : room.getBook().getBookId())
+                        .bookTitle(room.getBook() == null ? null : room.getBook().getTitle())
+                        .bookCoverUrl(room.getBook() ==  null ? null : room.getBook().getCoverUrl())
                         .updatedAt(getRoomActivityAt(room))
                         .build())
                 .collect(Collectors.toList());
@@ -103,7 +105,9 @@ public class ChatService {
                 .map(room -> RoomListRes.builder()
                         .roomId(room.getRoomId())
                         .topic(room.getTopic())
-                        .bookId(room.getBook().getBookId())
+                        .bookId(room.getBook() == null ? null : room.getBook().getBookId())
+                        .bookTitle(room.getBook() == null ? null : room.getBook().getTitle())
+                        .bookCoverUrl(room.getBook() ==  null ? null : room.getBook().getCoverUrl())
                         .updatedAt(getRoomActivityAt(room))
                         .build())
                 .collect(Collectors.toList());
