@@ -87,7 +87,7 @@ public class BookService {
 
         if (mainStudy.isPresent()) {
             MainStudy ms = mainStudy.get();
-            return BookDetailRes.of(book, ms.getReadingStatus(), ms.getStartDate(), ms.getEndDate(), true);
+            return BookDetailRes.of(book, ms.getMainId(), ms.getReadingStatus(), ms.getStartDate(), ms.getEndDate(), true);
         }
         return BookDetailRes.from(book);
     }

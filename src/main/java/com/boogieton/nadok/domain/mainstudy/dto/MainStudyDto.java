@@ -39,6 +39,7 @@ public class MainStudyDto {
     public static class StudyListRes {
         private Long mainId;
         private Long bookId;
+        private String isbn;
         private String title;
         private String author;
         private String coverUrl;
@@ -50,6 +51,7 @@ public class MainStudyDto {
             return StudyListRes.builder()
                     .mainId(mainStudy.getMainId())
                     .bookId(mainStudy.getBook().getBookId())
+                    .isbn(mainStudy.getBook().getIsbn())
                     .title(mainStudy.getBook().getTitle())
                     .author(mainStudy.getBook().getAuthor())
                     .coverUrl(mainStudy.getBook().getCoverUrl())

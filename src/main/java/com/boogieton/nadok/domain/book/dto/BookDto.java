@@ -25,6 +25,7 @@ public class BookDto {
     @Getter
     @Builder
     public static class BookDetailRes {
+        private Long mainId;
         private Long bookId;
         private String title;
         private String author;
@@ -33,13 +34,16 @@ public class BookDto {
         private String bookIntro;
         private String publisher;
         private Integer pageCount;
+        private String publishYear;
+        private Integer currentPage;
         private ReadingStatus readingStatus;
         private LocalDate startDate;
         private LocalDate endDate;
-        private boolean isInMyStudy;
+        private boolean inMyStudy;
 
-        public static BookDetailRes of(Book book, ReadingStatus readingStatus, LocalDate startDate, LocalDate endDate, boolean isInMyStudy) {
+        public static BookDetailRes of(Book book, Long mainId, ReadingStatus readingStatus, LocalDate startDate, LocalDate endDate, boolean inMyStudy) {
             return BookDetailRes.builder()
+                    .mainId(mainId)
                     .bookId(book.getBookId())
                     .title(book.getTitle())
                     .author(book.getAuthor())
@@ -48,15 +52,18 @@ public class BookDto {
                     .bookIntro(book.getBookIntro())
                     .publisher(book.getPublisher())
                     .pageCount(book.getPageCount())
+                    .publishYear(null)
+                    .currentPage(null)
                     .readingStatus(readingStatus)
                     .startDate(startDate)
                     .endDate(endDate)
-                    .isInMyStudy(isInMyStudy)
+                    .inMyStudy(inMyStudy)
                     .build();
         }
 
         public static BookDetailRes from(Book book) {
             return BookDetailRes.builder()
+                    .mainId(null)
                     .bookId(book.getBookId())
                     .title(book.getTitle())
                     .author(book.getAuthor())
@@ -65,7 +72,9 @@ public class BookDto {
                     .bookIntro(book.getBookIntro())
                     .publisher(book.getPublisher())
                     .pageCount(book.getPageCount())
-                    .isInMyStudy(false)
+                    .publishYear(null)
+                    .currentPage(null)
+                    .inMyStudy(false)
                     .build();
         }
     }
