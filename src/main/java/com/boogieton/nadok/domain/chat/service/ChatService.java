@@ -186,7 +186,7 @@ public class ChatService {
         RoomListRes response = RoomListRes.builder()
                 .roomId(room.getRoomId())
                 .topic(room.getTopic())
-                .bookId(room.getBook().getBookId())
+                .bookId(room.getBook() == null ? null : room.getBook().getBookId())
                 .updatedAt(getRoomActivityAt(room))
                 .build();
         chatRoomRepository.delete(room);
