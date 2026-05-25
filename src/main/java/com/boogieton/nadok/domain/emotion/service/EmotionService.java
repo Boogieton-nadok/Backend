@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -75,14 +76,30 @@ public class EmotionService {
         return EmotionResultRes.builder()
                 .inputId(emotionInput.getInputId())
                 .resultId(emotionResult.getResultId())
-                .character(EmotionResultRes.CharacterInfo.builder()
-                        .characterId(character.getCharacterId())
-                        .characterName(character.getCharacterName())
-                        .characterImgUrl(character.getCharacterImgUrl())
-                        .bookQuote(character.getBookQuote())
-                        .methodReason(character.getMethodReason())
-                        .build())
+                .character(toCharacterInfo(character))
                 .createdAt(emotionInput.getCreatedAt())
+                .build();
+    }
+
+    public List<String> getMonthlyEmotions(Long userId) {
+        return emotionInputRepository.findMonthlyEmotionStats(userId);
+    }
+
+    public List<EmotionResultRes.CharacterInfo> getMetCharacters(Long userId) {
+        return emotionResultRepository.findDistinctCharactersByUserId(userId)
+                .stream()
+                .map(this::toCharacterInfo)
+                .collect(Collectors.toList());
+    }
+
+    private EmotionResultRes.CharacterInfo toCharacterInfo(Character character) {
+        return EmotionResultRes.CharacterInfo.builder()
+                .characterId(character.getCharacterId())
+                .characterName(character.getCharacterName())
+                .author(character.getAuthor())
+                .characterImgUrl(character.getCharacterImgUrl())
+                .bookQuote(character.getBookQuote())
+                .methodReason(character.getMethodReason())
                 .build();
     }
 }

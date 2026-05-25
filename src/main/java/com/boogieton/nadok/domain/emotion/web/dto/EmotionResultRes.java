@@ -18,6 +18,7 @@ public class EmotionResultRes {
     public static class CharacterInfo {
         private Long characterId;
         private String characterName;
+        private String author;
         private String characterImgUrl;
         private String bookQuote;
         private String methodReason;
