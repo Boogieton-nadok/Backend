@@ -11,6 +11,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry){
         registry.addMapping("/**")
+                .allowCredentials(true)
                 .allowedOrigins("http://localhost:5173", "https://ideatone-fe.vercel.app/")
                 .allowedOriginPatterns("*")
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH")
@@ -18,11 +19,8 @@ public class WebConfig implements WebMvcConfigurer {
 
     }
     @Override
-    public void addResourceHandlers(ResourceHandlerRegistry registry){ // 👈 이 부분에 { }가 잘못 들어가 있습니다.
-        String uploadDir = System.getProperty("user.dir") + "/uploads/profiles/";
-
-
-        registry.addResourceHandler("/uploads/profiles/**")
-                .addResourceLocations("file:" + uploadDir + "/");
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("/uploads/**")
+                .addResourceLocations("file:/home/ubuntu/nadok/uploads/");
     }
 }
