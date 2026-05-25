@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface MemoRepository extends JpaRepository<Memo, Long> {
     List<Memo> findByMainStudyMainId(Long mainId);
+    List<Memo> findByMainStudyUserUserIdOrderByUpdatedAtDesc(Long userId);
 }
