@@ -17,6 +17,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -82,6 +84,33 @@ public class UserService {
     }
 
     @Transactional
+    public void deleteUser(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BaseException(UserResponseCode.USER_NOT_FOUND));
+        userRepository.delete(user);
+    }
+
+    @Transactional
+    public ProfileRes updateUser(Long userId, UpdateReq updateReq) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BaseException(UserResponseCode.USER_NOT_FOUND));
+
+        if (updateReq.getNickname() != null) {
+            if (userRepository.existsByNicknameAndUserIdNot(updateReq.getNickname(), userId)) {
+                throw new BaseException(UserResponseCode.NICKNAME_DUPLICATION);
+            }
+        }
+        user.updateProfile(
+                updateReq.getNickname(),
+                updateReq.getPassword(),
+                updateReq.getGender(),
+                updateReq.getBirthday()
+        );
+
+        return ProfileRes.fromEntity(user);
+    }
+
+    @Transactional
     public ProfileRes updateProfileImg(Long userId, MultipartFile profileImg) {
         // 1. 유저 존재 여부 확인
         User user = userRepository.findById(userId)
@@ -104,10 +133,11 @@ public class UserService {
         String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
         String savedFilename = UUID.randomUUID().toString() + extension;
 
-        // 5. 로컬 파일 시스템에 파일 저장 (uploadDir 사용)
-        File destinationFile = new File(uploadDir + savedFilename);
+        Path destinationPath = Paths.get(uploadDir, savedFilename);
+
         try {
-            profileImg.transferTo(destinationFile);
+            // MultipartFile의 transferTo는 Path 객체도 지원합니다 (Spring 5.1 이상)
+            profileImg.transferTo(destinationPath);
         } catch (IOException e) {
             throw new RuntimeException("파일 저장 중 오류가 발생했습니다.", e);
         }
