@@ -22,6 +22,9 @@ public class Character extends BaseEntity {
     @Column(nullable = false)
     private String characterName;
 
+    @Column(nullable = false)
+    private String author;
+
     @Column(nullable = false, columnDefinition = "TEXT")
     private String bookQuote;
 
