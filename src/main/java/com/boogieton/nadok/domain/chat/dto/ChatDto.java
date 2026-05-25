@@ -35,6 +35,7 @@ public class ChatDto {
         private Long roomId;
         private String topic;
         private Long bookId;
+        private String isbn;
         private String bookTitle;
         private String bookCoverUrl;
         private LocalDateTime updatedAt;

@@ -35,7 +35,6 @@ public class BookService {
 
     private static final String ALADIN_SEARCH_URL = "http://www.aladin.co.kr/ttb/api/ItemSearch.aspx";
 
-    // searchBooks 메서드는 기존 유지...
     public List<BookSearchRes> searchBooks(String keyword) {
         try {
             String url = UriComponentsBuilder.fromUriString(ALADIN_SEARCH_URL)
@@ -60,13 +59,22 @@ public class BookService {
 
             List<BookSearchRes> result = new ArrayList<>();
             for (Map<String, Object> item : items) {
+                // 💡 알라딘 pubDate 데이터 가공 (예: "2023-11-01" -> 앞 4자리만 끊어서 연도 추출 혹은 전체 저장)
+                String fullPubDate = (String) item.get("pubDate");
+                String publishYear = (fullPubDate != null && fullPubDate.length() >= 4) ? fullPubDate.substring(0, 4) : null;
+
+                // 알라딘 검색 API 특성상 페이지 수가 제공되지 않으면 null 처리
+                Integer subPageCount = (item.get("subInfo") != null && ((Map)item.get("subInfo")).get("itemPage") != null)
+                        ? (Integer) ((Map)item.get("subInfo")).get("itemPage") : null;
+
                 result.add(BookSearchRes.builder()
                         .title((String) item.get("title"))
                         .author((String) item.get("author"))
                         .isbn((String) item.get("isbn13"))
                         .coverUrl((String) item.get("cover"))
                         .publisher((String) item.get("publisher"))
-                        .pageCount(null)
+                        .publishYear(publishYear) // 💡 파싱한 출판년도 추가
+                        .pageCount(subPageCount)  // 💡 가공한 페이지 수 추가
                         .bookIntro((String) item.get("description"))
                         .build());
             }

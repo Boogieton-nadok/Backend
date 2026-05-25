@@ -10,17 +10,43 @@ import java.time.LocalDate;
 
 public class BookDto {
 
-    // 알라딘 검색 응답 DTO도 동일한 규칙 적용
+    // 💡 4번(camelCase) 및 5번(값이 없을 때 null) 규칙을 적용하여 BookSearchRes 수정
     @Getter
     @Builder
     public static class BookSearchRes {
         private String title;
         private String author;
         private String isbn;
-        private String coverUrl;
+        private String coverUrl;    // camelCase 통일
         private String publisher;
-        private Integer pageCount;
-        private String bookIntro;
+        private String publishYear; // 추가: 검색 리스트에서도 노출하면 프론트가 빌드하기 좋습니다.
+        private Integer pageCount;  // camelCase 통일
+        private String bookIntro;   // camelCase 통일
+
+        // 알라딘 API 응답 데이터를 객체로 변환할 때 null 처리를 안전하게 하기 위한 팩토리 메서드 추가
+        public static BookSearchRes of(String title, String author, String isbn, String coverUrl,
+                                       String publisher, String rawPublishYear, Integer rawPageCount, String bookIntro) {
+
+            // 값이 없거나 공백 문자열이면 null 처리
+            String processedPublishYear = (rawPublishYear == null || rawPublishYear.isBlank()) ? null : rawPublishYear;
+            String processedCoverUrl = (coverUrl == null || coverUrl.isBlank()) ? null : coverUrl;
+            String processedBookIntro = (bookIntro == null || bookIntro.isBlank()) ? null : bookIntro;
+            String processedPublisher = (publisher == null || publisher.isBlank()) ? null : publisher;
+
+            // 페이지 수가 없거나 0이면 null 처리
+            Integer processedPageCount = (rawPageCount == null || rawPageCount == 0) ? null : rawPageCount;
+
+            return BookSearchRes.builder()
+                    .title(title)
+                    .author(author)
+                    .isbn(isbn)
+                    .coverUrl(processedCoverUrl)
+                    .publisher(processedPublisher)
+                    .publishYear(processedPublishYear)
+                    .pageCount(processedPageCount)
+                    .bookIntro(processedBookIntro)
+                    .build();
+        }
     }
 
     @Getter
@@ -44,11 +70,8 @@ public class BookDto {
 
         // 1. 내 서재에 등록된 도서 상세 응답
         public static BookDetailRes of(MainStudy mainStudy, Book book, ReadingStatus readingStatus, LocalDate startDate, LocalDate endDate, boolean isInMyStudy) {
-            // 💡 값이 비어있으면 null로 치환하는 헬퍼 로직 적용
             String publishYear = (book.getPublishYear() == null || book.getPublishYear().isBlank()) ? null : book.getPublishYear();
             Integer pageCount = (book.getPageCount() == null || book.getPageCount() == 0) ? null : book.getPageCount();
-
-            // "페이지 정보 = 총 페이지 수" 규칙에 따르되, 총 페이지가 null이면 현재 페이지도 null
             Integer currentPage = pageCount;
 
             return BookDetailRes.builder()
@@ -60,9 +83,9 @@ public class BookDto {
                     .coverUrl(book.getCoverUrl())
                     .bookIntro(book.getBookIntro())
                     .publisher(book.getPublisher())
-                    .publishYear(publishYear)   // 💡 null 처리된 값 대입
-                    .pageCount(pageCount)       // 💡 null 처리된 값 대입
-                    .currentPage(currentPage)   // 💡 null 처리된 값 대입
+                    .publishYear(publishYear)
+                    .pageCount(pageCount)
+                    .currentPage(currentPage)
                     .readingStatus(readingStatus)
                     .startDate(startDate)
                     .endDate(endDate)
@@ -84,9 +107,9 @@ public class BookDto {
                     .coverUrl(book.getCoverUrl())
                     .bookIntro(book.getBookIntro())
                     .publisher(book.getPublisher())
-                    .publishYear(publishYear)   // 💡 null 처리된 값 대입
-                    .pageCount(pageCount)       // 💡 null 처리된 값 대입
-                    .currentPage(null)          // 💡 서재에 없는 책이므로 0 대신 명확히 null 반환
+                    .publishYear(publishYear)
+                    .pageCount(pageCount)
+                    .currentPage(null)
                     .readingStatus(null)
                     .startDate(null)
                     .endDate(null)

@@ -84,6 +84,7 @@ public class ChatService {
                 .map(room -> RoomListRes.builder()
                         .roomId(room.getRoomId())
                         .topic(room.getTopic())
+                        .isbn(room.getBook() == null ? null : room.getBook().getIsbn())
                         .bookId(room.getBook() == null ? null : room.getBook().getBookId())
                         .bookTitle(room.getBook() == null ? null : room.getBook().getTitle())
                         .bookCoverUrl(room.getBook() ==  null ? null : room.getBook().getCoverUrl())
