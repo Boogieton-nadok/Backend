@@ -38,6 +38,9 @@ public class User extends BaseEntity {
     @Column(nullable = true)
     private Date birthday;
 
+    @Column(nullable = true)
+    private String profileImgUrl;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ChatRoom> chatRooms = new ArrayList<>();
 
@@ -50,5 +53,12 @@ public class User extends BaseEntity {
         if (password != null) this.password = password;
         if (gender != null) this.gender = gender;
         if (birthday != null) this.birthday = birthday;
+    }
+
+
+    public void updateProfileImg(String profileImgUrl) {
+        if (profileImgUrl != null) {
+            this.profileImgUrl = profileImgUrl;
+        }
     }
 }

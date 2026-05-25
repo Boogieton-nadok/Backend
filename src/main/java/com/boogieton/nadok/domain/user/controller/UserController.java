@@ -8,6 +8,7 @@ import com.boogieton.nadok.global.response.SuccessResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/user")
@@ -43,6 +44,16 @@ public class UserController {
             @RequestBody UpdateReq updateReq) {
 
         ProfileRes result = userService.updateUser(userId, updateReq);
+        return SuccessResponse.of(result, UserResponseCode.UPDATE_SUCCESS);
+    }
+
+
+    @PostMapping("/updateimg/{userId}")
+    public SuccessResponse<ProfileRes> updateProfileImg(
+            @PathVariable Long userId,
+            @RequestParam("profileImg") MultipartFile profileImg) { // String 대신 MultipartFile 사용
+
+        ProfileRes result = userService.updateProfileImg(userId, profileImg);
         return SuccessResponse.of(result, UserResponseCode.UPDATE_SUCCESS);
     }
 
