@@ -48,7 +48,7 @@ public class MainStudyService {
                         .coverUrl(req.getCoverUrl())
                         .bookIntro(req.getBookIntro())
                         .publisher(req.getPublisher())
-                        // .publishYear(req.getPublishYear()) // 💡 필요시 CreateReq 스펙 확장 후 연동 가능
+                        .publishYear(req.getPublishYear()) // 💡 필요시 CreateReq 스펙 확장 후 연동 가능
                         .pageCount(req.getPageCount())
                         .build()));
 
