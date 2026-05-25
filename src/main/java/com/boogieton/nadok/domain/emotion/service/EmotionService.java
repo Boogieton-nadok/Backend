@@ -82,10 +82,14 @@ public class EmotionService {
     }
 
     public List<String> getMonthlyEmotions(Long userId) {
+        userRepository.findById(userId)
+                .orElseThrow(() -> new BaseException(EmotionResponseCode.USER_NOT_FOUND));
         return emotionInputRepository.findMonthlyEmotionStats(userId);
     }
 
     public List<EmotionResultRes.CharacterInfo> getMetCharacters(Long userId) {
+        userRepository.findById(userId)
+                .orElseThrow(() -> new BaseException(EmotionResponseCode.USER_NOT_FOUND));
         return emotionResultRepository.findDistinctCharactersByUserId(userId)
                 .stream()
                 .map(this::toCharacterInfo)
@@ -98,6 +102,7 @@ public class EmotionService {
                 .characterName(character.getCharacterName())
                 .author(character.getAuthor())
                 .characterImgUrl(character.getCharacterImgUrl())
+                .characterThumbUrl(character.getCharacterThumbUrl())
                 .bookQuote(character.getBookQuote())
                 .methodReason(character.getMethodReason())
                 .build();
