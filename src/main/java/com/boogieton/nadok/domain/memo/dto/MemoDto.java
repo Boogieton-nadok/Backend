@@ -14,12 +14,14 @@ public class MemoDto {
     public static class CreateReq {
         @NotNull
         private Long mainId;
+        private String title;
         @NotBlank
         private String content;
     }
 
     @Getter
     public static class UpdateReq {
+        private String title;
         @NotBlank
         private String content;
     }
@@ -28,6 +30,7 @@ public class MemoDto {
     @Builder
     public static class MemoRes {
         private Long memoId;
+        private String title;
         private String content;
         private LocalDateTime createdAt;
         private LocalDateTime updatedAt;
@@ -35,6 +38,7 @@ public class MemoDto {
         public static MemoRes from(Memo memo) {
             return MemoRes.builder()
                     .memoId(memo.getMemoId())
+                    .title(memo.getTitle())
                     .content(memo.getContent())
                     .createdAt(memo.getCreatedAt())
                     .updatedAt(memo.getUpdatedAt())

@@ -19,6 +19,9 @@ public class Memo extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long memoId;
 
+    @Column
+    private String title;
+
     @Column(columnDefinition = "TEXT")
     private String content;
 
@@ -27,7 +30,8 @@ public class Memo extends BaseEntity {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private MainStudy mainStudy;
 
-    public void updateContent(String content) {
-        this.content = content;
+    public void updateContent(String title, String content) {
+        if (title != null) this.title = title;
+        if (content != null) this.content = content;
     }
 }

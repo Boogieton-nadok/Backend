@@ -35,6 +35,7 @@ public class MemoService {
                 .orElseThrow(() -> new BaseException(MainStudyResponseCode.MAIN_STUDY_NOT_FOUND));
 
         Memo memo = Memo.builder()
+                .title(req.getTitle())
                 .content(req.getContent())
                 .mainStudy(mainStudy)
                 .build();
@@ -47,7 +48,7 @@ public class MemoService {
         Memo memo = memoRepository.findById(memoId)
                 .orElseThrow(() -> new BaseException(MemoResponseCode.MEMO_NOT_FOUND));
 
-        memo.updateContent(req.getContent());
+        memo.updateContent(req.getTitle(), req.getContent());
         return MemoRes.from(memo);
     }
 
