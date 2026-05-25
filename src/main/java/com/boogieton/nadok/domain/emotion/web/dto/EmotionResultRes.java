@@ -20,6 +20,7 @@ public class EmotionResultRes {
         private String characterName;
         private String author;
         private String characterImgUrl;
+        private String characterThumbUrl;
         private String bookQuote;
         private String methodReason;
     }

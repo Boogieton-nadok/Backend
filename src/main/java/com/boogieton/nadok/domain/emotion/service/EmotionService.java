@@ -102,6 +102,7 @@ public class EmotionService {
                 .characterName(character.getCharacterName())
                 .author(character.getAuthor())
                 .characterImgUrl(character.getCharacterImgUrl())
+                .characterThumbUrl(character.getCharacterThumbUrl())
                 .bookQuote(character.getBookQuote())
                 .methodReason(character.getMethodReason())
                 .build();
