@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -36,6 +35,7 @@ public class BookService {
 
     private static final String ALADIN_SEARCH_URL = "http://www.aladin.co.kr/ttb/api/ItemSearch.aspx";
 
+    // searchBooks 메서드는 기존 유지...
     public List<BookSearchRes> searchBooks(String keyword) {
         try {
             String url = UriComponentsBuilder.fromUriString(ALADIN_SEARCH_URL)
@@ -79,6 +79,7 @@ public class BookService {
         }
     }
 
+    // 💡 도서 상세 응답 필드 보강 로직
     public BookDetailRes getBookDetail(String isbn, Long userId) {
         Book book = bookRepository.findByIsbn(isbn)
                 .orElseThrow(() -> new BaseException(BookResponseCode.BOOK_NOT_FOUND));
@@ -87,9 +88,9 @@ public class BookService {
 
         if (mainStudy.isPresent()) {
             MainStudy ms = mainStudy.get();
-            return BookDetailRes.of(book, ms.getReadingStatus(), ms.getStartDate(), ms.getEndDate(), true);
+            return BookDetailRes.of(ms, book, ms.getReadingStatus(), ms.getStartDate(), ms.getEndDate(), true);
         }
+
         return BookDetailRes.from(book);
     }
-
 }

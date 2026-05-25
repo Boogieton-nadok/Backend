@@ -33,5 +33,7 @@ public class Book extends BaseEntity {
 
     private String publisher;
 
+    private String publishYear;
+
     private Integer pageCount;
 }
