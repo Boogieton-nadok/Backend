@@ -10,16 +10,17 @@ import java.time.LocalDate;
 
 public class BookDto {
 
+    // 알라딘 검색 응답 DTO도 동일한 규칙 적용
     @Getter
     @Builder
     public static class BookSearchRes {
         private String title;
         private String author;
         private String isbn;
-        private String coverUrl;   // 💡 camelCase 통일
+        private String coverUrl;
         private String publisher;
-        private Integer pageCount;  // 💡 camelCase 통일
-        private String bookIntro;  // 💡 camelCase 통일
+        private Integer pageCount;
+        private String bookIntro;
     }
 
     @Getter
@@ -30,19 +31,26 @@ public class BookDto {
         private String title;
         private String author;
         private String isbn;
-        private String coverUrl;   // 💡 camelCase 통일
-        private String bookIntro;  // 💡 camelCase 통일
+        private String coverUrl;
+        private String bookIntro;
         private String publisher;
         private String publishYear;
-        private Integer pageCount;  // 💡 camelCase 통일
+        private Integer pageCount;
         private Integer currentPage;
         private ReadingStatus readingStatus;
-        private LocalDate startDate; // 💡 camelCase 통일
-        private LocalDate endDate;   // 💡 camelCase 통일
+        private LocalDate startDate;
+        private LocalDate endDate;
         private boolean isInMyStudy;
 
         // 1. 내 서재에 등록된 도서 상세 응답
         public static BookDetailRes of(MainStudy mainStudy, Book book, ReadingStatus readingStatus, LocalDate startDate, LocalDate endDate, boolean isInMyStudy) {
+            // 💡 값이 비어있으면 null로 치환하는 헬퍼 로직 적용
+            String publishYear = (book.getPublishYear() == null || book.getPublishYear().isBlank()) ? null : book.getPublishYear();
+            Integer pageCount = (book.getPageCount() == null || book.getPageCount() == 0) ? null : book.getPageCount();
+
+            // "페이지 정보 = 총 페이지 수" 규칙에 따르되, 총 페이지가 null이면 현재 페이지도 null
+            Integer currentPage = pageCount;
+
             return BookDetailRes.builder()
                     .mainId(mainStudy.getMainId())
                     .bookId(book.getBookId())
@@ -52,9 +60,9 @@ public class BookDto {
                     .coverUrl(book.getCoverUrl())
                     .bookIntro(book.getBookIntro())
                     .publisher(book.getPublisher())
-                    .publishYear(book.getPublishYear())
-                    .pageCount(book.getPageCount())
-                    .currentPage(book.getPageCount()) // 💡 "페이지 정보 = 총 페이지 수" 반영
+                    .publishYear(publishYear)   // 💡 null 처리된 값 대입
+                    .pageCount(pageCount)       // 💡 null 처리된 값 대입
+                    .currentPage(currentPage)   // 💡 null 처리된 값 대입
                     .readingStatus(readingStatus)
                     .startDate(startDate)
                     .endDate(endDate)
@@ -62,8 +70,11 @@ public class BookDto {
                     .build();
         }
 
-        // 2. 내 서재에 등록되지 않은 도서 상세 응답 (MainStudy 파라미터 버그 수정)
+        // 2. 내 서재에 등록되지 않은 도서 상세 응답
         public static BookDetailRes from(Book book) {
+            String publishYear = (book.getPublishYear() == null || book.getPublishYear().isBlank()) ? null : book.getPublishYear();
+            Integer pageCount = (book.getPageCount() == null || book.getPageCount() == 0) ? null : book.getPageCount();
+
             return BookDetailRes.builder()
                     .mainId(null)
                     .bookId(book.getBookId())
@@ -73,9 +84,9 @@ public class BookDto {
                     .coverUrl(book.getCoverUrl())
                     .bookIntro(book.getBookIntro())
                     .publisher(book.getPublisher())
-                    .publishYear(book.getPublishYear())
-                    .pageCount(book.getPageCount())
-                    .currentPage(book.getPageCount())
+                    .publishYear(publishYear)   // 💡 null 처리된 값 대입
+                    .pageCount(pageCount)       // 💡 null 처리된 값 대입
+                    .currentPage(null)          // 💡 서재에 없는 책이므로 0 대신 명확히 null 반환
                     .readingStatus(null)
                     .startDate(null)
                     .endDate(null)
