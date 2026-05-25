@@ -16,10 +16,10 @@ public class BookDto {
         private String title;
         private String author;
         private String isbn;
-        private String coverUrl;
+        private String coverUrl;   // 💡 camelCase 통일
         private String publisher;
-        private Integer pageCount;
-        private String bookIntro;
+        private Integer pageCount;  // 💡 camelCase 통일
+        private String bookIntro;  // 💡 camelCase 통일
     }
 
     @Getter
@@ -30,18 +30,18 @@ public class BookDto {
         private String title;
         private String author;
         private String isbn;
-        private String coverUrl;
-        private String bookIntro;
+        private String coverUrl;   // 💡 camelCase 통일
+        private String bookIntro;  // 💡 camelCase 통일
         private String publisher;
-        private String publishYear;   // 💡 추가
-        private Integer pageCount;
-        private Integer currentPage;  // 💡 추가
+        private String publishYear;
+        private Integer pageCount;  // 💡 camelCase 통일
+        private Integer currentPage;
         private ReadingStatus readingStatus;
-        private LocalDate startDate;
-        private LocalDate endDate;
+        private LocalDate startDate; // 💡 camelCase 통일
+        private LocalDate endDate;   // 💡 camelCase 통일
         private boolean isInMyStudy;
 
-        // 1. 내 서재에 등록된 도서 응답 (ms가 존재할 때)
+        // 1. 내 서재에 등록된 도서 상세 응답
         public static BookDetailRes of(MainStudy mainStudy, Book book, ReadingStatus readingStatus, LocalDate startDate, LocalDate endDate, boolean isInMyStudy) {
             return BookDetailRes.builder()
                     .mainId(mainStudy.getMainId())
@@ -54,7 +54,7 @@ public class BookDto {
                     .publisher(book.getPublisher())
                     .publishYear(book.getPublishYear())
                     .pageCount(book.getPageCount())
-                    .currentPage(book.getPageCount())
+                    .currentPage(book.getPageCount()) // 💡 "페이지 정보 = 총 페이지 수" 반영
                     .readingStatus(readingStatus)
                     .startDate(startDate)
                     .endDate(endDate)
@@ -62,7 +62,7 @@ public class BookDto {
                     .build();
         }
 
-        // 2. 내 서재에 등록되지 않은 도서 응답 (💡 파라미터에서 MainStudy 제거하여 버그 수정)
+        // 2. 내 서재에 등록되지 않은 도서 상세 응답 (MainStudy 파라미터 버그 수정)
         public static BookDetailRes from(Book book) {
             return BookDetailRes.builder()
                     .mainId(null)
