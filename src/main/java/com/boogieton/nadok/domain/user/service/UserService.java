@@ -14,6 +14,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -103,48 +107,65 @@ public class UserService {
 
     @Transactional
     public ProfileRes updateProfileImg(Long userId, MultipartFile profileImg) {
-        // 1. 유저 존재 여부 확인
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new BaseException(UserResponseCode.USER_NOT_FOUND));
-
-        // 2. 파일이 비어있는지 확인
-        if (profileImg == null || profileImg.isEmpty()) {
-            throw new BaseException(UserResponseCode.INVALID_FILE); // 적절한 예외 코드를 사용하세요
-        }
-
-        // 3. 로컬에 저장할 경로 설정 (예: 프로젝트 루트 폴더 안의 uploads 폴더)
-        String uploadDir = System.getProperty("user.dir") + "/uploads/profiles/";
-        File dir = new File(uploadDir);
-        if (!dir.exists()) {
-            dir.mkdirs(); // 해당 디렉토리가 없으면 생성
-        }
-
-        // 4. 파일명 중복 방지를 위해 UUID 생성 및 확장자 추출
-        String originalFilename = profileImg.getOriginalFilename();
-        String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
-        String savedFilename = UUID.randomUUID().toString() + extension;
-
-        // 5. 로컬 파일 시스템에 파일 저장
-        File destinationFile = new File(uploadDir + savedFilename);
         try {
-            profileImg.transferTo(destinationFile);
-        } catch (IOException e) {
-            throw new RuntimeException("파일 저장 중 오류가 발생했습니다.", e);
-        }
+            // 1. 유저 존재 여부 확인
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new BaseException(UserResponseCode.USER_NOT_FOUND));
 
-        // 6. DB에 저장할 접근 경로(URL) 정의
-        // 로컬 환경이므로 우선 서버 내부 정적 리소스 경로 형식으로 저장합니다.
-        String profileImgUrl = "/uploads/profiles/" + savedFilename;
+            // 2. 파일이 비어있는지 확인
+            if (profileImg == null || profileImg.isEmpty()) {
+                throw new BaseException(UserResponseCode.INVALID_FILE);
+            }
 
-        // 7. 엔티티 상태 변경 (Dirty Checking으로 인해 자동 업데이트)
-        user.updateProfileImg(profileImgUrl);
+            // 3. 로컬에 저장할 경로 설정 (예: 프로젝트 루트 폴더 안의 uploads 폴더)
+            String uploadDir = System.getProperty("user.dir") + "/uploads/profiles/";
+            File dir = new File(uploadDir);
+            if (!dir.exists()) {
+                dir.mkdirs(); // 해당 디렉토리가 없으면 생성
+            }
 
-        // 8. DTO 반환
-        return ProfileRes.builder()
-                .userId(user.getUserId())
-                .nickname(user.getNickname())
-                .email(user.getEmail())
-                .profileImgUrl(user.getProfileImgUrl())
-                .build();
+            // 4. 파일명 중복 방지를 위해 UUID 생성 및 확장자 추출
+            String originalFilename = profileImg.getOriginalFilename();
+            String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+            String savedFilename = UUID.randomUUID().toString() + extension;
+
+            // 5. 로컬 파일 시스템에 파일 저장
+            File destinationFile = new File(uploadDir + savedFilename);
+            try {
+                profileImg.transferTo(destinationFile);
+            } catch (IOException e) {
+                throw new RuntimeException("파일 저장 중 오류가 발생했습니다.", e);
+            }
+
+            // 6. DB에 저장할 접근 경로(URL) 정의
+            String profileImgUrl = "/uploads/profiles/" + savedFilename;
+
+            // 7. 엔티티 상태 변경 (Dirty Checking으로 인해 자동 업데이트)
+            user.updateProfileImg(profileImgUrl);
+
+            // 8. DTO 반환
+            return ProfileRes.builder()
+                    .userId(user.getUserId())
+                    .nickname(user.getNickname())
+                    .email(user.getEmail())
+                    .profileImgUrl(user.getProfileImgUrl())
+                    .build();
+
+        } catch (Exception e) {
+        // 1) Stack Trace 문자열로 추출
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        e.printStackTrace(pw);
+        String stackTrace = sw.toString();
+
+        // 2) 에러 정보 포장
+        Map<String, Object> errorLog = new HashMap<>();
+        errorLog.put("exceptionType", e.getClass().getSimpleName());
+        errorLog.put("message", e.getMessage());
+        errorLog.put("stackTrace", stackTrace);
+
+        // 💡 [수정] 새로 분리한 독립 예외 클래스를 던집니다.
+        throw new com.boogieton.nadok.global.exception.ImageUploadDebugException(errorLog);
     }
+        }
 }

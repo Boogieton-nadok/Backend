@@ -103,4 +103,17 @@ public class GlobalExceptionHandler {
         ErrorResponse<?> errorResponse = ErrorResponse.from(ErrorResponseCode.SERVER_ERROR);
         return ResponseEntity.status(errorResponse.getHttpStatus()).body(errorResponse);
     }
+
+    // 💡 프로필 이미지 업로드 전용 디버깅 예외 핸들러
+    @ExceptionHandler(ImageUploadDebugException.class)
+    public ResponseEntity<ErrorResponse<?>> handleImageDebugException(ImageUploadDebugException e) {
+
+        // e.getDebugData()로 가로챈 로그 정보를 바로 꺼내서 data 필드에 주입
+        ErrorResponse<?> errorResponse = ErrorResponse.of(
+                ErrorResponseCode.SERVER_ERROR,
+                e.getDebugData()
+        );
+
+        return ResponseEntity.status(errorResponse.getHttpStatus()).body(errorResponse);
+    }
 }
