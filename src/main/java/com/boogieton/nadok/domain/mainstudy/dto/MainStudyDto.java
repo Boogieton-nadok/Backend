@@ -10,7 +10,58 @@ import java.time.LocalDate;
 
 public class MainStudyDto {
 
-    // CreateReq, UpdateReq, StudyListRes 코드는 기존과 동일...
+    @Getter
+    public static class CreateReq {
+        @NotNull
+        private String isbn;
+        private String title;
+        private String author;
+        private String coverUrl;   // 💡 camelCase 통일
+        private String bookIntro;  // 💡 camelCase 통일
+        private String publisher;
+        private String publishYear; // 💡 추가
+        private Integer pageCount;  // 💡 camelCase 통일
+        @NotNull
+        private ReadingStatus readingStatus;
+        private LocalDate startDate; // 💡 camelCase 통일
+        private LocalDate endDate;   // 💡 camelCase 통일
+    }
+
+    @Getter
+    public static class UpdateReq {
+        @NotNull
+        private ReadingStatus readingStatus;
+        private LocalDate startDate; // 💡 camelCase 통일
+        private LocalDate endDate;   // 💡 camelCase 통일
+    }
+
+    @Getter
+    @Builder
+    public static class StudyListRes {
+        private Long mainId;
+        private Long bookId;
+        private String title;
+        private String author;
+        private String coverUrl;   // 💡 camelCase 통일
+        private String isbn;       // 💡 ISBN -> isbn 명명 규칙 통일
+        private ReadingStatus readingStatus;
+        private LocalDate startDate; // 💡 camelCase 통일
+        private LocalDate endDate;   // 💡 camelCase 통일
+
+        public static StudyListRes from(MainStudy mainStudy) {
+            return StudyListRes.builder()
+                    .mainId(mainStudy.getMainId())
+                    .bookId(mainStudy.getBook().getBookId())
+                    .title(mainStudy.getBook().getTitle())
+                    .author(mainStudy.getBook().getAuthor())
+                    .coverUrl(mainStudy.getBook().getCoverUrl())
+                    .isbn(mainStudy.getBook().getIsbn())
+                    .readingStatus(mainStudy.getReadingStatus())
+                    .startDate(mainStudy.getStartDate())
+                    .endDate(mainStudy.getEndDate())
+                    .build();
+        }
+    }
 
     @Getter
     @Builder
