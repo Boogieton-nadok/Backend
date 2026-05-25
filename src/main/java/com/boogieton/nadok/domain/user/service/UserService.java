@@ -104,7 +104,7 @@ public class UserService {
         String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
         String savedFilename = UUID.randomUUID().toString() + extension;
 
-        // 5. 로컬 파일 시스템에 파일 저장
+        // 5. 로컬 파일 시스템에 파일 저장 (uploadDir 사용)
         File destinationFile = new File(uploadDir + savedFilename);
         try {
             profileImg.transferTo(destinationFile);
@@ -112,8 +112,8 @@ public class UserService {
             throw new RuntimeException("파일 저장 중 오류가 발생했습니다.", e);
         }
 
-        // 6. DB에 저장할 접근 경로(URL) 정의
-        // 로컬 환경이므로 우선 서버 내부 정적 리소스 경로 형식으로 저장합니다.
+        // 💡 6. DB에 저장할 접근 경로(URL) 정의 수정
+        // WebConfig의 addResourceHandler("/uploads/profiles/**")와 매칭되는 웹 경로
         String profileImgUrl = "/uploads/profiles/" + savedFilename;
 
         // 7. 엔티티 상태 변경 (Dirty Checking으로 인해 자동 업데이트)
