@@ -73,11 +73,13 @@ public class MainStudyDto {
         private String coverUrl;
         private String bookIntro;
         private String publisher;
+        private String publishYear;   // 💡 도서 상세와 통일을 위해 추가
         private Integer pageCount;
+        private Integer currentPage;  // 💡 도서 상세와 통일을 위해 추가 ("페이지 정보 = 총 페이지 수")
         private ReadingStatus readingStatus;
         private LocalDate startDate;
         private LocalDate endDate;
-        private boolean isInMyStudy;
+        private boolean isInMyStudy; // 💡 Jackson의 JSON 직렬화 명명 규칙 스펙 통일을 위해 primitive 대신 변경 권장되나 프론트 필드명 매핑 유지
 
         public static StudyDetailRes from(MainStudy mainStudy) {
             return StudyDetailRes.builder()
@@ -89,7 +91,9 @@ public class MainStudyDto {
                     .coverUrl(mainStudy.getBook().getCoverUrl())
                     .bookIntro(mainStudy.getBook().getBookIntro())
                     .publisher(mainStudy.getBook().getPublisher())
+                    .publishYear(mainStudy.getBook().getPublishYear()) // 💡 추가된 필드 매핑
                     .pageCount(mainStudy.getBook().getPageCount())
+                    .currentPage(mainStudy.getBook().getPageCount())  // 💡 "페이지 정보 = 총 페이지 수" 반영
                     .readingStatus(mainStudy.getReadingStatus())
                     .startDate(mainStudy.getStartDate())
                     .endDate(mainStudy.getEndDate())

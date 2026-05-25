@@ -75,7 +75,7 @@ public class BookDto {
                     .publisher(book.getPublisher())
                     .publishYear(book.getPublishYear())
                     .pageCount(book.getPageCount())
-                    .currentPage(0)
+                    .currentPage(book.getPageCount())
                     .readingStatus(null)
                     .startDate(null)
                     .endDate(null)

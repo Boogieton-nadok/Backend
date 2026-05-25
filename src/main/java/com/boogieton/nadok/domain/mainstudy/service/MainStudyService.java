@@ -27,7 +27,10 @@ public class MainStudyService {
     private final BookRepository bookRepository;
 
     public List<StudyListRes> getMyStudyList(Long userId) {
-        return mainStudyRepository.findByUserUserId(userId).stream()
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BaseException(UserResponseCode.USER_NOT_FOUND));
+
+        return mainStudyRepository.findByUserUserId(user.getUserId()).stream()
                 .map(StudyListRes::from)
                 .collect(Collectors.toList());
     }
@@ -38,18 +41,18 @@ public class MainStudyService {
                 .orElseThrow(() -> new BaseException(UserResponseCode.USER_NOT_FOUND));
 
         Book book = bookRepository.findByIsbn(req.getIsbn())
-                .orElseGet(() -> bookRepository.save(
-                        Book.builder()
-                                .title(req.getTitle())
-                                .author(req.getAuthor())
-                                .isbn(req.getIsbn())
-                                .coverUrl(req.getCoverUrl())
-                                .bookIntro(req.getBookIntro())
-                                .publisher(req.getPublisher())
-                                .pageCount(req.getPageCount())
-                                .build()
-                ));
+                .orElseGet(() -> bookRepository.save(Book.builder()
+                        .isbn(req.getIsbn())
+                        .title(req.getTitle())
+                        .author(req.getAuthor())
+                        .coverUrl(req.getCoverUrl())
+                        .bookIntro(req.getBookIntro())
+                        .publisher(req.getPublisher())
+                        // .publishYear(req.getPublishYear()) // 💡 필요시 CreateReq 스펙 확장 후 연동 가능
+                        .pageCount(req.getPageCount())
+                        .build()));
 
+        // 중복 가입 방지
         if (mainStudyRepository.existsByUserUserIdAndBookBookId(userId, book.getBookId())) {
             throw new BaseException(MainStudyResponseCode.MAIN_STUDY_ALREADY_EXISTS);
         }
