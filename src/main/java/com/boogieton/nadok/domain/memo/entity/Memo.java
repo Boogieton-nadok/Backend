@@ -19,6 +19,9 @@ public class Memo extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long memoId;
 
+    @Column
+    private String title;
+
     @Column(columnDefinition = "TEXT")
     private String content;
 
