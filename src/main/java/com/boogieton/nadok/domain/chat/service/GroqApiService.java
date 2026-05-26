@@ -61,7 +61,7 @@ public class GroqApiService {
         }
 
         Map<String, Object> body = new HashMap<>();
-        body.put("model", "llama-3.1-8b-instant");
+        body.put("model", "llama-3.3-70b-versatile");
         body.put("messages", messages);
 
         try {
