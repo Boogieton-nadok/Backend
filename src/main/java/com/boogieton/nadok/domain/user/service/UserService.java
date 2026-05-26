@@ -157,4 +157,12 @@ public class UserService {
                 .profileImgUrl(user.getProfileImgUrl())
                 .build();
     }
+
+    public CheckAvailableRes checkEmail(String email) {
+        User user = userRepository.findByEmail(email);
+        if (user != null) {
+            throw new BaseException(UserResponseCode.NICKNAME_DUPLICATION);
+        }
+        return new CheckAvailableRes(true);
+    }
 }

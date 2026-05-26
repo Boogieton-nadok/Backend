@@ -2,6 +2,7 @@ package com.boogieton.nadok.domain.user.controller;
 
 import com.boogieton.nadok.domain.user.dto.UserDto;
 import com.boogieton.nadok.domain.user.dto.UserDto.*;
+import com.boogieton.nadok.domain.user.entity.User;
 import com.boogieton.nadok.domain.user.exception.UserResponseCode;
 import com.boogieton.nadok.domain.user.service.UserService;
 import com.boogieton.nadok.global.response.SuccessResponse;
@@ -30,6 +31,11 @@ public class UserController {
     @GetMapping("/check")
     public SuccessResponse<CheckAvailableRes> checkNickname(@RequestParam String nickname){
         return SuccessResponse.of(userService.checkNickname(nickname), UserResponseCode.NICKNAME_SUCCESS);
+    }
+
+    @GetMapping("/check/email")
+    public SuccessResponse<CheckAvailableRes> checkEmail(@RequestParam String email){
+        return SuccessResponse.of(userService.checkEmail(email), UserResponseCode.EMAIL_DUPLICATION);
     }
 
     @DeleteMapping("/{userId}")
