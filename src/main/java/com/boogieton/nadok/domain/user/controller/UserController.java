@@ -35,7 +35,7 @@ public class UserController {
 
     @GetMapping("/check/email")
     public SuccessResponse<CheckAvailableRes> checkEmail(@RequestParam String email){
-        return SuccessResponse.of(userService.checkEmail(email), UserResponseCode.EMAIL_DUPLICATION);
+        return SuccessResponse.of(userService.checkEmail(email), UserResponseCode.EMAIL_SUCCESS);
     }
 
     @DeleteMapping("/{userId}")
