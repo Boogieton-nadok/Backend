@@ -144,8 +144,6 @@ public class ChatService {
         chatMessageRepository.save(userMessage);
 
         List<ChatMessage> fullHistory = chatMessageRepository.findByChatRoomOrderByCreatedAtAsc(room);
-        Book book = room.getBook();
-        String title = (book != null) ? book.getTitle() : null;
 
         int maxMessages = 20;
         List<ChatMessage> chatHistory = fullHistory.size() > maxMessages
