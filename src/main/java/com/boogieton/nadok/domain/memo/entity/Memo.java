@@ -30,6 +30,10 @@ public class Memo extends BaseEntity {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private MainStudy mainStudy;
 
+    public void updateTitle(String title) {
+        this.title = title;
+    }
+
     public void updateContent(String content) {
         this.content = content;
     }
