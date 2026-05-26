@@ -34,7 +34,7 @@ public class MemoService {
     }
 
     @Transactional
-    public MemoRes createMemo(CreateReq req) {
+    public MemoDetailRes createMemo(CreateReq req) {
         MainStudy mainStudy = mainStudyRepository.findById(req.getMainId())
                 .orElseThrow(() -> new BaseException(MainStudyResponseCode.MAIN_STUDY_NOT_FOUND));
 
@@ -44,7 +44,15 @@ public class MemoService {
                 .mainStudy(mainStudy)
                 .build();
 
-        return MemoRes.from(memoRepository.save(memo));
+        memoRepository.save(memo);
+
+        return MemoDetailRes.builder()
+                .memoId(memo.getMemoId())
+                .title(memo.getTitle())
+                .content(memo.getContent())
+                .createdAt(memo.getCreatedAt())
+                .updatedAt(memo.getUpdatedAt())
+                .build();
     }
 
     @Transactional
