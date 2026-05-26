@@ -30,7 +30,7 @@ public class MemoController {
     }
 
     @PostMapping
-    public SuccessResponse<MemoRes> createMemo(@Valid @RequestBody CreateReq req) {
+    public SuccessResponse<MemoDetailRes> createMemo(@Valid @RequestBody CreateReq req) {
         return SuccessResponse.of(memoService.createMemo(req), MemoResponseCode.MEMO_SAVE_SUCCESS);
     }
 
