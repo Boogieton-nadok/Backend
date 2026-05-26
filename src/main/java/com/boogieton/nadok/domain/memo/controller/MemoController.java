@@ -35,7 +35,7 @@ public class MemoController {
     }
 
     @PatchMapping("/{memoId}")
-    public SuccessResponse<MemoRes> updateMemo(
+    public SuccessResponse<MemoDetailRes> updateMemo(
             @PathVariable Long memoId,
             @Valid @RequestBody UpdateReq req) {
         return SuccessResponse.of(memoService.updateMemo(memoId, req), MemoResponseCode.MEMO_UPDATE_SUCCESS);

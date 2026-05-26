@@ -56,12 +56,19 @@ public class MemoService {
     }
 
     @Transactional
-    public MemoRes updateMemo(Long memoId, UpdateReq req) {
+    public MemoDetailRes updateMemo(Long memoId, UpdateReq req) {
         Memo memo = memoRepository.findById(memoId)
                 .orElseThrow(() -> new BaseException(MemoResponseCode.MEMO_NOT_FOUND));
 
+        memo.updateTitle(req.getTitle());
         memo.updateContent(req.getContent());
-        return MemoRes.from(memo);
+        return MemoDetailRes.builder()
+                .memoId(memo.getMemoId())
+                .title(memo.getTitle())
+                .content(memo.getContent())
+                .createdAt(memo.getCreatedAt())
+                .updatedAt(memo.getUpdatedAt())
+                .build();
     }
 
     @Transactional
