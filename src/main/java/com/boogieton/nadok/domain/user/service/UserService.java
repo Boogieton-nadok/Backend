@@ -1,5 +1,6 @@
 package com.boogieton.nadok.domain.user.service;
 
+import com.boogieton.nadok.domain.user.dto.UserDto;
 import com.boogieton.nadok.domain.user.dto.UserDto.*;
 import com.boogieton.nadok.domain.user.entity.User;
 import com.boogieton.nadok.domain.user.exception.UserResponseCode;
@@ -164,5 +165,13 @@ public class UserService {
             throw new BaseException(UserResponseCode.NICKNAME_DUPLICATION);
         }
         return new CheckAvailableRes(true);
+    }
+
+    public ProfileRes getUser(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BaseException(UserResponseCode.USER_NOT_FOUND));
+        ProfileRes profileRes = ProfileRes.fromEntity(user);
+        return profileRes;
+
     }
 }
