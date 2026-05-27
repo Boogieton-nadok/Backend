@@ -150,13 +150,10 @@ public class UserService {
         // 7. 엔티티 상태 변경 (Dirty Checking으로 인해 자동 업데이트)
         user.updateProfileImg(profileImgUrl);
 
+        ProfileRes profileRes = ProfileRes.fromEntity(user);
+
         // 8. DTO 반환
-        return ProfileRes.builder()
-                .userId(user.getUserId())
-                .nickname(user.getNickname())
-                .email(user.getEmail())
-                .profileImgUrl(user.getProfileImgUrl())
-                .build();
+        return profileRes;
     }
 
     public CheckAvailableRes checkEmail(String email) {
