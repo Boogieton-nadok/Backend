@@ -71,7 +71,11 @@ public class GeminiApiService {
                 }
                 """, inputText, emotionTag, comfortMethod, characterList);
 
+
+
         String result = callGemini(prompt);
+
+        System.out.println(result);
 
         try {
             String cleaned = result.replaceAll("```json", "").replaceAll("```", "").trim();
