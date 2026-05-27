@@ -79,6 +79,7 @@ public class UserDto {
                     .nickname(user.getNickname())
                     .gender(user.getGender())
                     .birthday(user.getBirthday())
+                    .profileImgUrl(user.getProfileImgUrl())
                     .createdAt(user.getCreatedAt())
                     .updatedAt(user.getUpdatedAt())
                     .build();

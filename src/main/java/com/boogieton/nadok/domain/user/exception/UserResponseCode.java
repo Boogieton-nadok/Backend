@@ -20,7 +20,8 @@ public enum UserResponseCode implements BaseResponseCode {
     UPDATE_SUCCESS("USER_200_3", 200, "회원 정보 수정 성공"),
     NICKNAME_SUCCESS("USER_200_4", 200, "사용할 수 있는 닉네임입니다."),
     EMAIL_SUCCESS("USER_200_6", 200, "사용할 수 있는 이메일입니다."),
-    DELETE_SUCCESS("USER_200_5", 200, "회원 탈퇴가 성공적으로 완료되었습니다.");
+    DELETE_SUCCESS("USER_200_5", 200, "회원 탈퇴가 성공적으로 완료되었습니다."),
+    USER_GET_SUCCESS("USER_200_7", 200, "회원 정보를 성공적으로 불러왔습니다.");
 
 
     private final String code;

@@ -28,6 +28,11 @@ public class UserController {
         return SuccessResponse.of(userService.signup(signupReq), UserResponseCode.SIGNUP_SUCCESS);
     }
 
+    @GetMapping("/{userId}")
+    public SuccessResponse<ProfileRes> getUser(@PathVariable("userId") Long userId){
+        return SuccessResponse.of(userService.getUser(userId), UserResponseCode.USER_GET_SUCCESS);
+    }
+
     @GetMapping("/check")
     public SuccessResponse<CheckAvailableRes> checkNickname(@RequestParam String nickname){
         return SuccessResponse.of(userService.checkNickname(nickname), UserResponseCode.NICKNAME_SUCCESS);
