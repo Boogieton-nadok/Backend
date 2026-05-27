@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -55,12 +56,18 @@ public class EmotionService {
 
         List<Character> characters = characterRepository.findAll();
 
-        Long characterId = geminiApiService.analyzeEmotion(
-                request.getInputText(),
-                request.getEmotionTag(),
-                request.getComfortMethod(),
-                characters
-        );
+        Long characterId;
+        try {
+            characterId = geminiApiService.analyzeEmotion(
+                    request.getInputText(),
+                    request.getEmotionTag(),
+                    request.getComfortMethod(),
+                    characters
+            );
+        } catch (Exception e) {
+            log.warn("Gemini API 실패, 랜덤 캐릭터 반환: {}", e.getMessage());
+            characterId = characters.get(new Random().nextInt(characters.size())).getCharacterId();
+        }
 
         log.info("Gemini 선택 캐릭터 ID: {}", characterId);
 
