@@ -43,7 +43,6 @@ public class GeminiApiService {
                                String comfortMethod, List<Character> characters) {
         StringBuilder characterList = new StringBuilder();
         for (Character character : characters) {
-            // 🐛 부기톤의 버그 수정: 기존 코드에 파라미터는 4개인데 서식 지정자(%s)가 3개뿐이어서 키워드(%s)를 추가했습니다!
             characterList.append(String.format(
                     "- ID: %d, 이름: %s, 키워드: %s, 명언: %s\n",
                     character.getCharacterId(),
@@ -96,8 +95,8 @@ public class GeminiApiService {
                 )
         );
 
-        int maxAttempts = 3;      // 최대 재시도 횟수
-        long delayMs = 2000;      // 실패 시 대기 시간 (2초)
+        int maxAttempts = 3;
+        long delayMs = 2000;
 
         for (int attempt = 1; attempt <= maxAttempts; attempt++) {
             try {
@@ -114,19 +113,15 @@ public class GeminiApiService {
                 return (String) parts.get(0).get("text");
 
             } catch (HttpStatusCodeException e) {
-                // HTTP 에러 처리 (예: 503 Service Unavailable, 429 Too Many Requests)
                 log.warn("Gemini API 호출 실패 (시도 {}/{}): 상태 코드 {}", attempt, maxAttempts, e.getStatusCode());
 
                 if (attempt == maxAttempts) {
                     if (e.getStatusCode() == HttpStatus.SERVICE_UNAVAILABLE || e.getStatusCode() == HttpStatus.TOO_MANY_REQUESTS) {
-                        // 💡 주의: 만약 BaseException에 문자열만 받는 생성자가 없다면 에러가 날 수 있습니다.
-                        // 그럴 경우 EmotionResponseCode.AI_SERVER_BUSY 같은 코드를 하나 새로 만들어서 넣어주세요!
                         throw new BaseException(EmotionResponseCode.AI_REQUEST_CONFUSION_ERROR);
                     }
                     throw new BaseException(EmotionResponseCode.AI_SERVICE_ERROR);
                 }
 
-                // 아직 재시도 기회가 남았다면 잠시 대기
                 try {
                     Thread.sleep(delayMs);
                 } catch (InterruptedException ie) {
@@ -135,7 +130,6 @@ public class GeminiApiService {
                 }
 
             } catch (Exception e) {
-                // HTTP 예외가 아닌 기타 오류는 재시도 없이 바로 에러 처리
                 log.error("Gemini API 알 수 없는 오류: {}", e.getMessage());
                 throw new BaseException(EmotionResponseCode.AI_SERVICE_ERROR);
             }
