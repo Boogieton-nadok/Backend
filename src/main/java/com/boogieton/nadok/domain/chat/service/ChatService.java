@@ -150,14 +150,18 @@ public class ChatService {
                 ? fullHistory.subList(fullHistory.size() - maxMessages, fullHistory.size())
                 : fullHistory;
 
-        // 1. 책이 있는지 먼저 확인하고, 없으면 null을, 있으면 제목을 가져옵니다.
-        String bookTitle = (room.getBook() != null) ? room.getBook().getTitle() : null;
+        Book book = room.getBook();
 
-        // 2. 안전하게 추출한 bookTitle을 넘겨줍니다.
+        String bookTitle = book != null ? book.getTitle() : null;
+        String bookAuthor = book != null ? book.getAuthor() : null;
+        String publicationYear = book != null ? book.getPublishYear() : null;
+
         String aiResponse = groqApiService.getAiResponse(
                 chatHistory,
                 room.getTopic(),
-                bookTitle
+                bookTitle,
+                bookAuthor,
+                publicationYear
         );
 
         ChatMessage aiMessage = ChatMessage.builder()
