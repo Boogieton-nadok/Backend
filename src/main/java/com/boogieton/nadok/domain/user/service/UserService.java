@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -29,6 +30,7 @@ import java.util.UUID;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
     @Value("${file.upload-dir}")
     private String uploadDir;
 
@@ -38,8 +40,8 @@ public class UserService {
         if (user == null) {
             throw new BaseException(UserResponseCode.USER_NOT_FOUND);
         }
-        if (!user.getPassword().equals(loginReq.getPassword())) {
-            throw new BaseException(UserResponseCode.LOGIN_FALSE);
+        if (!passwordEncoder.matches(loginReq.getPassword(), user.getPassword())) {
+            throw new BaseException(UserResponseCode.LOGIN_FALSE); // 비밀번호 불일치 예외 처리
         }
         ProfileRes profileRes = ProfileRes.fromEntity(user);
 
@@ -57,9 +59,12 @@ public class UserService {
         if(signupReq.getPassword().length() < 6 || signupReq.getPassword().length() > 8) {
             throw new BaseException(UserResponseCode.PASSWORD_TYPE_ERROR);
         }
+
+        String encodedPassword = passwordEncoder.encode(signupReq.getPassword());
+
         User user = User.builder()
                 .email(signupReq.getEmail())
-                .password(signupReq.getPassword())
+                .password(encodedPassword)
                 .nickname(signupReq.getNickname())
                 .build();
 
